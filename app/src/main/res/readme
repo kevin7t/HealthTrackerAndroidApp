@@ -1,0 +1,10 @@
+Activity_main   ->  App_bar_main        ->      Content_main (main screen)      -> Fragment container (Swap fragments here)
+                                                Fab
+                                                Toolbar
+
+
+
+                ->  **Navigation menu**
+
+                    Nav_header_main         ->  Header with icon and text above the menu
+                    Activity_main_drawer    ->  Navigation menu icons (Add options here)
