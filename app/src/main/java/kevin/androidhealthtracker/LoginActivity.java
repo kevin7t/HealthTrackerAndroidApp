@@ -49,15 +49,10 @@ import kevin.androidhealthtracker.Util.PropertyReader;
 public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<Cursor> {
 
 
-
-    RequestQueue queue ;
+    RequestQueue queue;
     private Properties properties;
     private PropertyReader propertyReader;
     private Context context;
-    /**
-     * Id to identity READ_CONTACTS permission request.
-     */
-    private static final int REQUEST_READ_CONTACTS = 0;
 
     /**
      * A dummy authentication store containing known user names and passwords.
@@ -115,11 +110,11 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
-         context = this;
+        context = this;
         queue = Volley.newRequestQueue(context);
         try {
             properties = new Properties();
-            properties=new PropertyReader(this,properties).getProperties("app.properties");
+            properties = new PropertyReader(this, properties).getProperties("app.properties");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -190,7 +185,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
     private boolean isEmailValid(String email) {
         //TODO: Replace this with your own logic
-        return email.contains("@");
+        return email.matches("[a-zA-Z1-9]+@[a-zA-z]+[.][a-zA-Z]+");
     }
 
     private boolean isPasswordValid(String password) {
@@ -278,7 +273,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                     public void onErrorResponse(VolleyError error) {
                         System.out.println(error);
                     }
-                }){
+                }) {
                     @Override
                     public String getBodyContentType() {
                         return "application/json; charset=utf-8";

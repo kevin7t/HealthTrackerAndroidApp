@@ -12,8 +12,8 @@ public class FragmentTwo extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        System.out.println("Loading fragment 1 ");
-        return inflater.inflate(R.layout.fragmentwo, container, false);
+        System.out.println("Loading fragment 2 ");
+        return inflater.inflate(R.layout.fragment_two, container, false);
     }
 }
 
