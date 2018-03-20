@@ -1,5 +1,4 @@
-package kevin.androidhealthtracker;
-
+package kevin.androidhealthtracker.fragments;
 
 import android.app.Fragment;
 import android.os.Bundle;
@@ -7,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import kevin.androidhealthtracker.R;
 
 public class FragmentThree extends Fragment {
     @Override

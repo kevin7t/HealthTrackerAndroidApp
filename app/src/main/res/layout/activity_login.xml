@@ -38,9 +38,9 @@
             <ImageView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:src="@drawable/ic_account_circle_white_36dp"
+                android:paddingBottom="24dp"
                 android:paddingTop="24dp"
-                android:paddingBottom="24dp"/>
+                android:src="@drawable/ic_account_circle_white_36dp" />
 
             <android.support.design.widget.TextInputLayout
                 android:layout_width="match_parent"

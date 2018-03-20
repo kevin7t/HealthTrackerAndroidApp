@@ -1,4 +1,4 @@
-package kevin.androidhealthtracker.Util;
+package kevin.androidhealthtracker.util;
 
 import android.content.Context;
 import android.content.res.AssetManager;
@@ -10,6 +10,7 @@ import java.util.Properties;
 public class PropertyReader {
     private Context context;
     private Properties properties;
+
     public PropertyReader(Context context, Properties properties) {
         this.context = context;
         this.properties = properties;
@@ -21,7 +22,7 @@ public class PropertyReader {
             InputStream inputStream = assetManager.open(fileName);
             properties.load(inputStream);
 
-        }catch (Exception e ){
+        } catch (Exception e) {
             System.out.println(e.getMessage());
         }
         return properties;

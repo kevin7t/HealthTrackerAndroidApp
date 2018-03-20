@@ -6,9 +6,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
-import android.support.design.widget.Snackbar;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -17,47 +15,46 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 
+import kevin.androidhealthtracker.fragments.FragmentHome;
+import kevin.androidhealthtracker.fragments.FragmentThree;
+import kevin.androidhealthtracker.fragments.FragmentTwo;
+
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
-    private Fragment fragment;
     FragmentTransaction transaction = getFragmentManager().beginTransaction().setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out);
+    private Fragment fragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        /**
-         * Set items on screen
-         */
-        setContentView(R.layout.nav_drawer);
+        //Setup items
+        setContentView(R.layout.main);
         Toolbar toolbar = findViewById(R.id.toolbar);
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         NavigationView navigationView = findViewById(R.id.nav_view);
-        FloatingActionButton fab = findViewById(R.id.fab);
-        BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
+        final BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
+        bottomNavigationView.setSelectedItemId(R.id.fragment_home);
         View headerView = navigationView.getHeaderView(0);
         setSupportActionBar(toolbar);
 
         transaction = getFragmentManager().beginTransaction();
         try {
-            transaction.replace(R.id.fragment_container, FragmentOne.class.newInstance()).commit();
+            transaction.replace(R.id.fragment_container, FragmentHome.class.newInstance()).commit();
         } catch (InstantiationException | IllegalAccessException | NullPointerException e) {
             e.printStackTrace();
         }
 
-        /**
-         * Set on click listeners
-         */
+        //Setup listeners
 
         navigationView.setNavigationItemSelectedListener(this);
-
         bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 // Handle navigation view item clicks here.
                 int id = item.getItemId();
                 Class fragmentClass = null;
-                if (id == R.id.fragment1) {
-                    fragmentClass = FragmentOne.class;
+                if (id == R.id.fragment_home) {
+                    fragmentClass = FragmentHome.class;
                 } else if (id == R.id.fragment2) {
                     fragmentClass = FragmentTwo.class;
                 } else if (id == R.id.fragment3) {
@@ -80,14 +77,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
-
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
 
         headerView.setOnClickListener(new View.OnClickListener() {
             @Override

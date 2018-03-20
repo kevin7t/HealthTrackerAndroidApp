@@ -3,17 +3,15 @@ package kevin.androidhealthtracker;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
-import android.content.Context;
-import android.support.annotation.RequiresApi;
-import android.support.v7.app.AppCompatActivity;
 import android.app.LoaderManager.LoaderCallbacks;
-
+import android.content.Context;
 import android.content.Loader;
 import android.database.Cursor;
 import android.os.AsyncTask;
-
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.RequiresApi;
+import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.View;
@@ -40,19 +38,14 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.Properties;
 
-import kevin.androidhealthtracker.Datamodels.Account;
-import kevin.androidhealthtracker.Util.PropertyReader;
+import kevin.androidhealthtracker.datamodels.Account;
+import kevin.androidhealthtracker.util.PropertyReader;
 
 /**
  * A login screen that offers login via email/password.
  */
 public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<Cursor> {
 
-
-    RequestQueue queue;
-    private Properties properties;
-    private PropertyReader propertyReader;
-    private Context context;
 
     /**
      * A dummy authentication store containing known user names and passwords.
@@ -61,6 +54,10 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     private static final String[] DUMMY_CREDENTIALS = new String[]{
             "foo@example.com:hello", "bar@example.com:world"
     };
+    RequestQueue queue;
+    private Properties properties;
+    private PropertyReader propertyReader;
+    private Context context;
     /**
      * Keep track of the login task to ensure we can cancel it if requested.
      */
@@ -96,6 +93,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             }
         });
 
+        //Authenticate the user with the server
         Button mEmailSignInButton = (Button) findViewById(R.id.email_sign_in_button);
         mEmailSignInButton.setOnClickListener(new OnClickListener() {
             @Override
@@ -135,14 +133,11 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         // Reset errors.
         mEmailView.setError(null);
         mPasswordView.setError(null);
-
-        // Store values at the time of the login attempt.
-        Account account = new Account();
         String email = mEmailView.getText().toString();
         String password = mPasswordView.getText().toString();
-        //TODO: Use PBKDF2 for passwords
-        account.setUserName(email);
-        account.setPassword(password);
+
+        // Store values at the time of the login attempt.
+        Account account = new Account(email, password);
 
         boolean cancel = false;
         View focusView = null;

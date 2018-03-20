@@ -1,4 +1,4 @@
-package kevin.androidhealthtracker.Util;
+package kevin.androidhealthtracker.util;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
@@ -9,7 +9,6 @@ import javax.crypto.spec.PBEKeySpec;
 
 
 public class PasswordTool {
-
 
     public static byte[] saltedHash(String password, byte[] salt) throws NoSuchAlgorithmException, InvalidKeySpecException {
         SecretKeyFactory keyFactory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
