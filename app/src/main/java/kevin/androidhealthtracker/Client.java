@@ -17,6 +17,9 @@ import java.io.UnsupportedEncodingException;
 
 public class Client {
     //Todo create a client jar in the server project and then user that as a dependency in here.
+    //TODO use restTemplate.exchange as a method for talking to api  return restTemplate.exchange(requestEntity, returnType).getBody();
+    //Types of RequestEntity and ParameterizedTypeReference<> in method.
+
     private final String accountJson;
 
     public Client(String a) {
