@@ -20,14 +20,16 @@ import kevin.androidhealthtracker.fragments.FragmentThree;
 import kevin.androidhealthtracker.fragments.FragmentTwo;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
-    FragmentTransaction transaction = getFragmentManager().beginTransaction().setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out);
+    private FragmentTransaction transaction = getFragmentManager().beginTransaction().setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out);
     private Fragment fragment;
+    private String sessionToken;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         //Setup items
+        sessionToken = autoLoginPreviousUser();
         setContentView(R.layout.main);
         Toolbar toolbar = findViewById(R.id.toolbar);
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
@@ -36,7 +38,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         bottomNavigationView.setSelectedItemId(R.id.fragment_home);
         View headerView = navigationView.getHeaderView(0);
         setSupportActionBar(toolbar);
-
         transaction = getFragmentManager().beginTransaction();
         try {
             transaction.replace(R.id.fragment_container, FragmentHome.class.newInstance()).commit();
@@ -85,6 +86,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 getApplicationContext().startActivity(login);
             }
         });
+    }
+
+    private String autoLoginPreviousUser(){
+        //Get user name from shared preferences
+        //Get password from shared preferences
+        //Authenticate user from server
+        //Return session id
+        return null;
     }
 
     @SuppressWarnings("StatementWithEmptyBody")
