@@ -38,40 +38,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         bottomNavigationView.setSelectedItemId(R.id.fragment_home);
         View headerView = navigationView.getHeaderView(0);
         setSupportActionBar(toolbar);
-        transaction = getFragmentManager().beginTransaction();
-        try {
-            transaction.replace(R.id.fragment_container, FragmentHome.class.newInstance()).commit();
-        } catch (InstantiationException | IllegalAccessException | NullPointerException e) {
-            e.printStackTrace();
-        }
+        loadMainFragment();
 
         //Setup listeners
-
         navigationView.setNavigationItemSelectedListener(this);
-        bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                // Handle navigation view item clicks here.
-                int id = item.getItemId();
-                Class fragmentClass = null;
-                if (id == R.id.fragment_home) {
-                    fragmentClass = FragmentHome.class;
-                } else if (id == R.id.fragment2) {
-                    fragmentClass = FragmentTwo.class;
-                } else if (id == R.id.fragment3) {
-                    fragmentClass = FragmentThree.class;
-                }
-
-                try {
-                    fragment = (Fragment) fragmentClass.newInstance();
-                } catch (IllegalAccessException | InstantiationException | NullPointerException e) {
-                    e.printStackTrace();
-                }
-                transaction = getFragmentManager().beginTransaction();
-                transaction.replace(R.id.fragment_container, fragment).commit();
-                return true;
-            }
-        });
+        bottomNavigationView.setOnNavigationItemSelectedListener(navigationItemSelectedListener);
+        headerView.setOnClickListener(loginOnClickListener);
 
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -79,22 +51,61 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         toggle.syncState();
 
 
-        headerView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent login = new Intent(MainActivity.this, LoginActivity.class);
-                getApplicationContext().startActivity(login);
-            }
-        });
     }
 
-    private String autoLoginPreviousUser(){
+    private String autoLoginPreviousUser() {
         //Get user name from shared preferences
         //Get password from shared preferences
         //Authenticate user from server
         //Return session id
         return null;
     }
+
+    private void loadMainFragment() {
+        transaction = getFragmentManager().beginTransaction();
+        try {
+            transaction.replace(R.id.fragment_container, FragmentHome.class.newInstance()).commit();
+        } catch (InstantiationException | IllegalAccessException | NullPointerException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @NonNull
+    private BottomNavigationView.OnNavigationItemSelectedListener navigationItemSelectedListener
+            = new BottomNavigationView.OnNavigationItemSelectedListener() {
+        @Override
+        public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+            // Handle navigation view item clicks here.
+            int id = item.getItemId();
+            Class fragmentClass = null;
+            if (id == R.id.fragment_home) {
+                fragmentClass = FragmentHome.class;
+            } else if (id == R.id.fragment2) {
+                fragmentClass = FragmentTwo.class;
+            } else if (id == R.id.fragment3) {
+                fragmentClass = FragmentThree.class;
+            }
+
+            try {
+                fragment = (Fragment) fragmentClass.newInstance();
+            } catch (IllegalAccessException | InstantiationException | NullPointerException e) {
+                e.printStackTrace();
+            }
+            transaction = getFragmentManager().beginTransaction();
+            transaction.replace(R.id.fragment_container, fragment).commit();
+            return true;
+        }
+    };
+
+
+    private View.OnClickListener loginOnClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            Intent login = new Intent(MainActivity.this, LoginActivity.class);
+            getApplicationContext().startActivity(login);
+        }
+    };
+
 
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
