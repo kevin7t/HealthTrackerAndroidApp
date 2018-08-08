@@ -4,11 +4,12 @@ android {
     compileSdkVersion 26
     defaultConfig {
         applicationId "kevin.androidhealthtracker"
-        minSdkVersion 21
+        minSdkVersion 26
         targetSdkVersion 26
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        multiDexEnabled true
     }
     buildTypes {
         release {
@@ -16,18 +17,34 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    packagingOptions {
+        exclude 'notice.txt'
+        exclude 'readme.txt'
+        exclude 'META-INF/**'
+        exclude 'changelog.txt'
+        exclude 'license.txt'
+    }
+
 }
 dependencies {
-    compile 'org.projectlombok:lombok:1.16.18'
-    annotationProcessor "org.projectlombok:lombok:1.16.18"
+    compileOnly 'org.projectlombok:lombok:1.18.2'
+    annotationProcessor 'org.projectlombok:lombok:1.18.2'
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'com.android.support:appcompat-v7:26.1.0'
     implementation 'com.android.support:design:26.1.0'
     implementation 'com.android.support.constraint:constraint-layout:1.0.2'
+    implementation 'com.android.support:multidex:1.0.3'
+
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
 
-    compile 'com.fasterxml.jackson.core:jackson-databind:2.9.2'
-    compile 'com.android.volley:volley:1.0.0'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.9.2'
+    implementation 'com.android.volley:volley:1.0.0'
+    implementation ('com.kevin.healthtracker:Datamodels:1.0')
+}
+
+configurations {
+    //Exclude spring data jpa as it causes problems with android. Not needed but comes with using client library
+    compile.exclude module: 'spring-boot-starter-data-jpa'
 }

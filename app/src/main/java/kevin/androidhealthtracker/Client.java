@@ -74,6 +74,6 @@ public class Client {
     }
 
     public String getSessionToken(){
-
+        return null;
     }
 }

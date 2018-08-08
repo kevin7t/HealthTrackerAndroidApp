@@ -15,6 +15,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 
+
 import kevin.androidhealthtracker.fragments.FragmentHome;
 import kevin.androidhealthtracker.fragments.FragmentThree;
 import kevin.androidhealthtracker.fragments.FragmentTwo;
@@ -23,6 +24,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private FragmentTransaction transaction = getFragmentManager().beginTransaction().setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out);
     private Fragment fragment;
     private String sessionToken;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,6 +82,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             Class fragmentClass = null;
             if (id == R.id.fragment_home) {
                 fragmentClass = FragmentHome.class;
+                //Todo: From fragment home/news feed once you go into replies that will replace this fragment, therefore must
+                //add the old fragment to backstack
             } else if (id == R.id.fragment2) {
                 fragmentClass = FragmentTwo.class;
             } else if (id == R.id.fragment3) {
