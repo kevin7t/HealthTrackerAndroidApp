@@ -5,6 +5,7 @@ import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.content.Context;
+import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
 import android.os.AsyncTask;
@@ -21,43 +22,24 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.NetworkResponse;
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.VolleyLog;
-import com.android.volley.toolbox.HttpHeaderParser;
-import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kevin.healthtracker.datamodels.User;
+
+import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.util.Properties;
 
-import kevin.androidhealthtracker.datamodels.Account;
 import kevin.androidhealthtracker.util.PropertyReader;
 
 /**
  * A login screen that offers login via email/password.
  */
 public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<Cursor> {
-
-
-    /**
-     * A dummy authentication store containing known user names and passwords.
-     * TODO: remove after connecting to a real authentication system.
-     */
-    private static final String[] DUMMY_CREDENTIALS = new String[]{
-            "foo@example.com:hello", "bar@example.com:world"
-    };
-    RequestQueue queue;
     private Properties properties;
     private PropertyReader propertyReader;
     private Context context;
+    private WebClient client;
     /**
      * Keep track of the login task to ensure we can cancel it if requested.
      */
@@ -78,15 +60,23 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         // Set up the login form.
         mEmailView = findViewById(R.id.email);
         mPasswordView = findViewById(R.id.password);
+        mLoginFormView = findViewById(R.id.login_form);
+        mProgressView = findViewById(R.id.login_progress);
+        context = this;
+        //TODO: Add this as properties
+        client = new WebClient(new RestTemplate(), "10.0.2.2", 8080);
+
+        try {
+            properties = new PropertyReader(this, properties).getProperties("app.properties");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
                 if (id == EditorInfo.IME_ACTION_DONE || id == EditorInfo.IME_NULL) {
-                    try {
-                        attemptLogin();
-                    } catch (JsonProcessingException e) {
-                        e.printStackTrace();
-                    }
+                    attemptLogin();
                     return true;
                 }
                 return false;
@@ -94,53 +84,35 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         });
 
         //Authenticate the user with the server
-        Button mEmailSignInButton = (Button) findViewById(R.id.email_sign_in_button);
+        Button mEmailSignInButton = findViewById(R.id.email_sign_in_button);
         mEmailSignInButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                try {
-                    attemptLogin();
-                } catch (JsonProcessingException e) {
-                    e.printStackTrace();
-                }
+                attemptLogin();
             }
         });
-
-        mLoginFormView = findViewById(R.id.login_form);
-        mProgressView = findViewById(R.id.login_progress);
-        context = this;
-        queue = Volley.newRequestQueue(context);
-        try {
-            properties = new Properties();
-            properties = new PropertyReader(this, properties).getProperties("app.properties");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
     }
-
 
     /**
      * Attempts to sign in or register the account specified by the login form.
      * If there are form errors (invalid email, missing fields, etc.), the
      * errors are presented and no actual login attempt is made.
      */
-    private void attemptLogin() throws JsonProcessingException {
-        if (mAuthTask != null) {
-            return;
-        }
+    private void attemptLogin() {
 
-        // Reset errors.
         mEmailView.setError(null);
         mPasswordView.setError(null);
         String email = mEmailView.getText().toString();
         String password = mPasswordView.getText().toString();
-
-        // Store values at the time of the login attempt.
-        Account account = new Account(email, password);
-
         boolean cancel = false;
         View focusView = null;
+        User user = new User();
+        user.setUserName(email);
+        user.setPassword(password);
+
+        if (mAuthTask != null) {
+            return;
+        }
 
         // Check for a valid password, if the user entered one.
         if (!TextUtils.isEmpty(password) && !isPasswordValid(password)) {
@@ -148,7 +120,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             focusView = mPasswordView;
             cancel = true;
         }
-
         // Check for a valid email address.
         if (TextUtils.isEmpty(email)) {
             mEmailView.setError(getString(R.string.error_field_required));
@@ -167,25 +138,10 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         } else {
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
-            ObjectMapper objectMapper = new ObjectMapper();
-            String accountJson = objectMapper.writeValueAsString(account);
-            System.out.println(accountJson);
-
-
             showProgress(true);
-            mAuthTask = new UserLoginTask(accountJson);
+            mAuthTask = new UserLoginTask(user);
             mAuthTask.execute((Void) null);
         }
-    }
-
-    private boolean isEmailValid(String email) {
-        //TODO: Replace this with your own logic
-        return email.matches("[a-zA-Z1-9]+@[a-zA-z]+[.][a-zA-Z]+");
-    }
-
-    private boolean isPasswordValid(String password) {
-        //TODO: Replace this with your own logic
-        return password.length() > 4;
     }
 
     /**
@@ -224,92 +180,25 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         }
     }
 
-    @Override
-    public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
-        return null;
-    }
-
-    @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
-
-    }
-
-    @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
-
-    }
-
-
     /**
      * Represents an asynchronous login/registration task used to authenticate
      * the user.
      */
     public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
+        private User user;
 
-        private final String accountJson;
-
-        UserLoginTask(String json) {
-            accountJson = json;
+        UserLoginTask(User user) {
+            this.user = user;
         }
 
         @Override
         protected Boolean doInBackground(Void... params) {
-            // TODO: attempt authentication against a network service.
-
-            try {
-                StringRequest stringRequest = new StringRequest(Request.Method.POST, properties.getProperty("url"),
-                        new Response.Listener<String>() {
-                            @Override
-                            public void onResponse(String response) {
-                                System.out.println(response);
-                            }
-                        }, new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        System.out.println(error);
-                    }
-                }) {
-                    @Override
-                    public String getBodyContentType() {
-                        return "application/json; charset=utf-8";
-                    }
-
-                    @Override
-                    public byte[] getBody() throws AuthFailureError {
-                        try {
-                            return accountJson == null ? null : accountJson.getBytes("utf-8");
-                        } catch (UnsupportedEncodingException uee) {
-                            VolleyLog.wtf("Unsupported Encoding while trying to get the bytes of %s using %s", accountJson, "utf-8");
-                            return null;
-                        }
-                    }
-
-                    @Override
-                    protected Response<String> parseNetworkResponse(NetworkResponse response) {
-                        String responseString = "";
-                        if (response != null) {
-                            responseString = String.valueOf(response.statusCode);
-                            // can get more details such as response.headers
-                        }
-                        return Response.success(responseString, HttpHeaderParser.parseCacheHeaders(response));
-                    }
-                };
-                queue.add(stringRequest);
-                // Simulate network access.
-                Thread.sleep(2000);
-            } catch (InterruptedException e) {
-                return false;
+            try{
+                user = client.registerUser(user);
+            }catch (RestClientException e){
+                System.out.println(e.getMessage());
             }
 
-//            for (String credential : DUMMY_CREDENTIALS) {
-//                String[] pieces = credential.split(":");
-//                if (pieces[0].equals(mEmail)) {
-//                    // Account exists, return true if the password matches.
-//                    return pieces[1].equals(mPassword);
-//                }
-//            }
-
-            // TODO: register the new account here.
             return true;
         }
 
@@ -319,6 +208,11 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             showProgress(false);
 
             if (success) {
+                Intent intent = new Intent();
+                intent.putExtra("userLoggedInStatus", true);
+                intent.putExtra("userName", user.getUserName());
+                intent.putExtra("userId", user.getId());
+                setResult(RESULT_OK, intent);
                 finish();
             } else {
                 mPasswordView.setError(getString(R.string.error_incorrect_password));
@@ -332,5 +226,27 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             showProgress(false);
         }
     }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
+        return null;
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+    }
+
+    private boolean isEmailValid(String email) {
+        return email.matches("[a-zA-Z1-9]+@[a-zA-z]+[.][a-zA-Z]+");
+    }
+
+    private boolean isPasswordValid(String password) {
+        return password.length() > 4;
+    }
+
 }
 

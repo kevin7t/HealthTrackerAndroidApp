@@ -14,6 +14,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 
 import kevin.androidhealthtracker.fragments.FragmentHome;
@@ -24,6 +25,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private FragmentTransaction transaction = getFragmentManager().beginTransaction().setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out);
     private Fragment fragment;
     private String sessionToken;
+    private Boolean loggedInStatus;
+    private String userName;
+    private int userId;
+    private static final int LOGIN_REQUEST_CODE = 0;
 
 
     @Override
@@ -101,15 +106,30 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     };
 
-
+    /**
+     * Start login activity
+     */
     private View.OnClickListener loginOnClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
             Intent login = new Intent(MainActivity.this, LoginActivity.class);
-            getApplicationContext().startActivity(login);
+            startActivityForResult(login, LOGIN_REQUEST_CODE);
         }
     };
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == LOGIN_REQUEST_CODE) {
+            if (resultCode == RESULT_OK) {
+                loggedInStatus = data.getBooleanExtra("userLoggedInStatus", false);
+                userName = data.getStringExtra("userName");
+                userId = data.getIntExtra("userId", 0);
+                Toast loggedIn = new Toast(this);
+                loggedIn.makeText(this, loggedInStatus.toString() + " " + userName + " " + userId, Toast.LENGTH_LONG).show();
+            }
+        }
+    }
 
     @SuppressWarnings("StatementWithEmptyBody")
     @Override

@@ -2,6 +2,8 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 26
+    buildToolsVersion "27.0.3"
+
     defaultConfig {
         applicationId "kevin.androidhealthtracker"
         minSdkVersion 26
@@ -9,7 +11,6 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-        multiDexEnabled true
     }
     buildTypes {
         release {
@@ -27,24 +28,31 @@ android {
 
 }
 dependencies {
-    compileOnly 'org.projectlombok:lombok:1.18.2'
-    annotationProcessor 'org.projectlombok:lombok:1.18.2'
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'com.android.support:appcompat-v7:26.1.0'
-    implementation 'com.android.support:design:26.1.0'
-    implementation 'com.android.support.constraint:constraint-layout:1.0.2'
-    implementation 'com.android.support:multidex:1.0.3'
+    compileOnly 'org.projectlombok:lombok:1.16.20'
+    annotationProcessor 'org.projectlombok:lombok:1.16.20'
+    api fileTree(dir: 'libs', include: ['*.jar'])
+    api 'com.android.support:appcompat-v7:26.1.0'
+    api 'com.android.support:design:26.1.0'
+    api 'com.android.support.constraint:constraint-layout:1.0.2'
 
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
 
-    implementation 'com.fasterxml.jackson.core:jackson-databind:2.9.2'
-    implementation 'com.android.volley:volley:1.0.0'
-    implementation ('com.kevin.healthtracker:Datamodels:1.0')
+    api 'com.fasterxml.jackson.core:jackson-databind:2.9.2'
+    api 'com.android.volley:volley:1.0.0'
+    api ('com.kevin.healthtracker:Datamodels:1.0')
+    api 'org.springframework.android:spring-android-rest-template:2.0.0.M3'
+
 }
 
 configurations {
     //Exclude spring data jpa as it causes problems with android. Not needed but comes with using client library
     compile.exclude module: 'spring-boot-starter-data-jpa'
+}
+
+android {
+    lintOptions {
+        lintConfig file("lint.xml")
+    }
 }
