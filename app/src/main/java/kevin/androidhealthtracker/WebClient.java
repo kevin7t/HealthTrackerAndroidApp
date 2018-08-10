@@ -21,8 +21,8 @@ public class WebClient {
         return restTemplate.postForObject(url + "/users/register", user, User.class);
     }
 
-    public Boolean loginUser(User user) {
-        return restTemplate.postForObject(url + "/users/login", user, Boolean.class);
+    public User loginUser(User user) {
+        return restTemplate.postForObject(url + "/users/login", user, User.class);
     }
 
     public User changePassword(User user) {
@@ -82,8 +82,12 @@ public class WebClient {
         return restTemplate.postForObject(url + "/feed/status", statusDTO, StatusDTO.class);
     }
 
-    public StatusDTO[] getStatus(int userId, int pageNumber) {
+    public StatusDTO[] getStatusFromUser(int userId, int pageNumber) {
         return restTemplate.getForObject(UriComponentsBuilder.fromHttpUrl(url + "/feed/status/user/" + userId).queryParam("page", pageNumber).build().toUri(), StatusDTO[].class);
+    }
+
+    public StatusDTO[] getStatusFromFriendsForUser(int userId, int pageNumber) {
+        return restTemplate.getForObject(UriComponentsBuilder.fromHttpUrl(url + "/feed/status/user/friendstatus/" + userId).queryParam("page", pageNumber).build().toUri(), StatusDTO[].class);
     }
 
     public void deleteStatus(int statusId) {

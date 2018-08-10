@@ -3,6 +3,7 @@ package kevin.androidhealthtracker;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
@@ -14,8 +15,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import org.springframework.web.client.RestTemplate;
 
 import kevin.androidhealthtracker.fragments.FragmentHome;
 import kevin.androidhealthtracker.fragments.FragmentThree;
@@ -25,29 +28,33 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private FragmentTransaction transaction = getFragmentManager().beginTransaction().setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out);
     private Fragment fragment;
     private String sessionToken;
-    private Boolean loggedInStatus;
     private String userName;
     private int userId;
     private static final int LOGIN_REQUEST_CODE = 0;
+    public SharedPreferences prefs;
+    public WebClient client;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        //Setup items
+        client = new WebClient(new RestTemplate(), "10.0.2.2", 8080);
+        prefs = getSharedPreferences("SharedPreferences", MODE_PRIVATE);
         sessionToken = autoLoginPreviousUser();
         setContentView(R.layout.main);
+
         Toolbar toolbar = findViewById(R.id.toolbar);
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         NavigationView navigationView = findViewById(R.id.nav_view);
-        final BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
+        BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
         bottomNavigationView.setSelectedItemId(R.id.fragment_home);
         View headerView = navigationView.getHeaderView(0);
+        TextView name = headerView.findViewById(R.id.userName);
+        name.setText("Username: " + prefs.getString("userName", "Log in") + " ID: " + prefs.getInt("userId", 0));
         setSupportActionBar(toolbar);
         loadMainFragment();
 
-        //Setup listeners
         navigationView.setNavigationItemSelectedListener(this);
         bottomNavigationView.setOnNavigationItemSelectedListener(navigationItemSelectedListener);
         headerView.setOnClickListener(loginOnClickListener);
@@ -56,7 +63,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
-
 
     }
 
@@ -122,11 +128,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == LOGIN_REQUEST_CODE) {
             if (resultCode == RESULT_OK) {
-                loggedInStatus = data.getBooleanExtra("userLoggedInStatus", false);
-                userName = data.getStringExtra("userName");
-                userId = data.getIntExtra("userId", 0);
+                userName = prefs.getString("userName", null);
+                userId = prefs.getInt("userId", 0);
                 Toast loggedIn = new Toast(this);
-                loggedIn.makeText(this, loggedInStatus.toString() + " " + userName + " " + userId, Toast.LENGTH_LONG).show();
+                loggedIn.makeText(this, userName + " " + userId, Toast.LENGTH_LONG).show();
+                TextView name = findViewById(R.id.userName);
+                name.setText("Username: " + prefs.getString("userName", "Log in") + " ID: " + prefs.getInt("userId", 0));
             }
         }
     }
@@ -135,7 +142,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
-
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;

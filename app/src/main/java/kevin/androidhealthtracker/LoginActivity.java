@@ -5,8 +5,8 @@ import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.content.Context;
-import android.content.Intent;
 import android.content.Loader;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -121,15 +121,15 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             cancel = true;
         }
         // Check for a valid email address.
-        if (TextUtils.isEmpty(email)) {
-            mEmailView.setError(getString(R.string.error_field_required));
-            focusView = mEmailView;
-            cancel = true;
-        } else if (!isEmailValid(email)) {
-            mEmailView.setError(getString(R.string.error_invalid_email));
-            focusView = mEmailView;
-            cancel = true;
-        }
+//        if (TextUtils.isEmpty(email)) {
+//            mEmailView.setError(getString(R.string.error_field_required));
+//            focusView = mEmailView;
+//            cancel = true;
+//        } else if (!isEmailValid(email)) {
+//            mEmailView.setError(getString(R.string.error_invalid_email));
+//            focusView = mEmailView;
+//            cancel = true;
+//        }
 
         if (cancel) {
             // There was an error; don't attempt login and focus the first
@@ -194,7 +194,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         @Override
         protected Boolean doInBackground(Void... params) {
             try{
-                user = client.registerUser(user);
+                user = client.loginUser(user);
             }catch (RestClientException e){
                 System.out.println(e.getMessage());
             }
@@ -208,11 +208,11 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             showProgress(false);
 
             if (success) {
-                Intent intent = new Intent();
-                intent.putExtra("userLoggedInStatus", true);
-                intent.putExtra("userName", user.getUserName());
-                intent.putExtra("userId", user.getId());
-                setResult(RESULT_OK, intent);
+                SharedPreferences.Editor editor = getSharedPreferences("SharedPreferences", Context.MODE_PRIVATE).edit();
+                editor.putInt("userId", user.getId());
+                editor.putString("userName", user.getUserName());
+                editor.apply();
+                setResult(RESULT_OK);
                 finish();
             } else {
                 mPasswordView.setError(getString(R.string.error_incorrect_password));
