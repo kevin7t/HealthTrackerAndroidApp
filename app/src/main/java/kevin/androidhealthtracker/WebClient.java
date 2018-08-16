@@ -9,6 +9,7 @@ import com.kevin.healthtracker.datamodels.dto.StatusDTO;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
+
 public class WebClient {
     private String url;
     private RestTemplate restTemplate;

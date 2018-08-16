@@ -6,6 +6,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,21 +17,40 @@ import android.widget.ListView;
 
 import com.kevin.healthtracker.datamodels.dto.StatusDTO;
 
+import org.springframework.web.client.ResourceAccessException;
+
 import java.util.Arrays;
 
 import kevin.androidhealthtracker.MainActivity;
 import kevin.androidhealthtracker.R;
 import kevin.androidhealthtracker.WebClient;
 
-public class FragmentHome extends Fragment {
+public class UserFeedFragment extends Fragment {
 
     private UserFeedRefreshTask userFeedRefreshTask;
     private WebClient client;
     private SharedPreferences prefs;
+    private StatusDTO[] statusList;
+
+    private View view;
     private ListView listView;
     private ListAdapter listAdapter;
-    private StatusDTO[] statusList;
+
     private FloatingActionButton floatingActionButton;
+    private SwipeRefreshLayout homeSwipeRefreshLayout;
+    /*
+     * Listview refresh actions
+     */
+    private SwipeRefreshLayout.OnRefreshListener swipeRefreshListener = new SwipeRefreshLayout.OnRefreshListener() {
+        @Override
+        public void onRefresh() {
+            refreshUserFeed();
+            homeSwipeRefreshLayout.setRefreshing(false);
+        }
+    };
+    /*
+     * Listview scrolling actions
+     */
     private AbsListView.OnScrollListener listViewListener = new AbsListView.OnScrollListener() {
         @Override
         public void onScrollStateChanged(AbsListView absListView, int i) {
@@ -46,6 +66,9 @@ public class FragmentHome extends Fragment {
             }
         }
     };
+    /*
+     * Floating button actions
+     */
     private View.OnClickListener floatingActionButtonListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
@@ -58,37 +81,50 @@ public class FragmentHome extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        client = ((MainActivity) this.getActivity()).client;
-        prefs = ((MainActivity) this.getActivity()).prefs;
+        client = MainActivity.client;
+        prefs = MainActivity.prefs;
 
-        View view = inflater.inflate(R.layout.fragment_home, container, false);
+        view = inflater.inflate(R.layout.fragment_home, container, false);
         floatingActionButton = view.findViewById(R.id.fab);
         listView = view.findViewById(R.id.fragment_home_list);
+        homeSwipeRefreshLayout = view.findViewById(R.id.home_swipe_layout);
 
-
+        homeSwipeRefreshLayout.setOnRefreshListener(swipeRefreshListener);
         floatingActionButton.setOnClickListener(floatingActionButtonListener);
         listView.setOnScrollListener(listViewListener);
+
+        refreshUserFeed();
         return view;
     }
 
-    @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
-        userFeedRefreshTask = new UserFeedRefreshTask();
-        userFeedRefreshTask.execute();
+    private void refreshUserFeed() {
+        if (prefs.getInt("userId", 0) != 0) {
+            userFeedRefreshTask = new UserFeedRefreshTask();
+            userFeedRefreshTask.execute();
+        }
     }
 
-    public class UserFeedRefreshTask extends AsyncTask<Void, Void, Boolean> {
+    private class UserFeedRefreshTask extends AsyncTask<Void, Void, Boolean> {
         @Override
         protected Boolean doInBackground(Void... voids) {
-            statusList = client.getStatusFromFriendsForUser(prefs.getInt("userId", 0), 1);
+            try {
+                statusList = client.getStatusFromFriendsForUser(prefs.getInt("userId", 0), 1);
+            } catch (ResourceAccessException e) {
+                e.printStackTrace();
+            }
             return true;
         }
 
         @Override
         protected void onPostExecute(Boolean aBoolean) {
             super.onPostExecute(aBoolean);
-            listAdapter = new ArrayAdapter<>(getActivity(), R.layout.list_item, Arrays.asList(statusList));
-            listView.setAdapter(listAdapter);
+            try {
+                listAdapter = new ArrayAdapter<>(getActivity(), R.layout.list_item, Arrays.asList(statusList));
+                listView.setAdapter(listAdapter);
+            } catch (NullPointerException e) {
+                e.printStackTrace();
+            }
+
         }
     }
 }

@@ -25,7 +25,6 @@ import android.widget.TextView;
 import com.kevin.healthtracker.datamodels.User;
 
 import org.springframework.web.client.RestClientException;
-import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
 import java.util.Properties;
@@ -64,7 +63,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         mProgressView = findViewById(R.id.login_progress);
         context = this;
         //TODO: Add this as properties
-        client = new WebClient(new RestTemplate(), "10.0.2.2", 8080);
+        client = MainActivity.client;
 
         try {
             properties = new PropertyReader(this, properties).getProperties("app.properties");

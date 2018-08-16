@@ -20,69 +20,29 @@ import android.widget.Toast;
 
 import org.springframework.web.client.RestTemplate;
 
-import kevin.androidhealthtracker.fragments.FragmentHome;
 import kevin.androidhealthtracker.fragments.FragmentThree;
 import kevin.androidhealthtracker.fragments.FragmentTwo;
+import kevin.androidhealthtracker.fragments.UserFeedFragment;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
     private FragmentTransaction transaction = getFragmentManager().beginTransaction().setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out);
     private Fragment fragment;
     private String sessionToken;
     private String userName;
+    public static SharedPreferences prefs;
+    public static WebClient client;
+    private DrawerLayout drawer;
+    private TextView name;
+    private View headerView;
+    private NavigationView navigationView;
+
     private int userId;
     private static final int LOGIN_REQUEST_CODE = 0;
-    public SharedPreferences prefs;
-    public WebClient client;
-
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        client = new WebClient(new RestTemplate(), "10.0.2.2", 8080);
-        prefs = getSharedPreferences("SharedPreferences", MODE_PRIVATE);
-        sessionToken = autoLoginPreviousUser();
-        setContentView(R.layout.main);
-
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        DrawerLayout drawer = findViewById(R.id.drawer_layout);
-        NavigationView navigationView = findViewById(R.id.nav_view);
-        BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
-        bottomNavigationView.setSelectedItemId(R.id.fragment_home);
-        View headerView = navigationView.getHeaderView(0);
-        TextView name = headerView.findViewById(R.id.userName);
-        name.setText("Username: " + prefs.getString("userName", "Log in") + " ID: " + prefs.getInt("userId", 0));
-        setSupportActionBar(toolbar);
-        loadMainFragment();
-
-        navigationView.setNavigationItemSelectedListener(this);
-        bottomNavigationView.setOnNavigationItemSelectedListener(navigationItemSelectedListener);
-        headerView.setOnClickListener(loginOnClickListener);
-
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.addDrawerListener(toggle);
-        toggle.syncState();
-
-    }
-
-    private String autoLoginPreviousUser() {
-        //Get user name from shared preferences
-        //Get password from shared preferences
-        //Authenticate user from server
-        //Return session id
-        return null;
-    }
-
-    private void loadMainFragment() {
-        transaction = getFragmentManager().beginTransaction();
-        try {
-            transaction.replace(R.id.fragment_container, FragmentHome.class.newInstance()).commit();
-        } catch (InstantiationException | IllegalAccessException | NullPointerException e) {
-            e.printStackTrace();
-        }
-    }
-
+    private BottomNavigationView bottomNavigationView;
+    private Toolbar toolbar;
+    /*
+     * Fragment switcher
+     */
     @NonNull
     private BottomNavigationView.OnNavigationItemSelectedListener navigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -92,7 +52,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             int id = item.getItemId();
             Class fragmentClass = null;
             if (id == R.id.fragment_home) {
-                fragmentClass = FragmentHome.class;
+                fragmentClass = UserFeedFragment.class;
                 //Todo: From fragment home/news feed once you go into replies that will replace this fragment, therefore must
                 //add the old fragment to backstack
             } else if (id == R.id.fragment2) {
@@ -111,8 +71,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             return true;
         }
     };
-
-    /**
+    /*
      * Start login activity
      */
     private View.OnClickListener loginOnClickListener = new View.OnClickListener() {
@@ -124,6 +83,60 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     };
 
     @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        client = new WebClient(new RestTemplate(), "10.0.2.2", 8080);
+        prefs = getSharedPreferences("SharedPreferences", MODE_PRIVATE);
+        sessionToken = autoLoginPreviousUser();
+        setContentView(R.layout.main);
+
+        toolbar = findViewById(R.id.toolbar);
+        navigationView = findViewById(R.id.nav_view);
+        bottomNavigationView = findViewById(R.id.bottom_navigation);
+        bottomNavigationView.setSelectedItemId(R.id.fragment_home);
+        headerView = navigationView.getHeaderView(0);
+        drawer = findViewById(R.id.drawer_layout);
+        name = headerView.findViewById(R.id.userName);
+        setUserToTextView();
+
+        navigationView.setNavigationItemSelectedListener(this);
+        bottomNavigationView.setOnNavigationItemSelectedListener(navigationItemSelectedListener);
+        headerView.setOnClickListener(loginOnClickListener);
+
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.addDrawerListener(toggle);
+        toggle.syncState();
+        setSupportActionBar(toolbar);
+        loadMainFragment();
+    }
+
+    private void loadMainFragment() {
+        transaction = getFragmentManager().beginTransaction();
+        try {
+            transaction.replace(R.id.fragment_container, UserFeedFragment.class.newInstance()).commit();
+        } catch (InstantiationException | IllegalAccessException | NullPointerException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void setUserToTextView() {
+        name.setText("Username: " + userName + " ID: " + userId);
+    }
+
+    private String autoLoginPreviousUser() {
+        //Get user name from shared preferences
+        //Get password from shared preferences
+        //Authenticate user from server
+        //Return session id
+        return null;
+    }
+
+    /*
+     * After user login login
+     */
+    @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == LOGIN_REQUEST_CODE) {
@@ -132,30 +145,46 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 userId = prefs.getInt("userId", 0);
                 Toast loggedIn = new Toast(this);
                 loggedIn.makeText(this, userName + " " + userId, Toast.LENGTH_LONG).show();
-                TextView name = findViewById(R.id.userName);
-                name.setText("Username: " + prefs.getString("userName", "Log in") + " ID: " + prefs.getInt("userId", 0));
+                setUserToTextView();
+                loadMainFragment();
             }
         }
     }
 
+    /*
+     * Opens drawer on hamburger icon press
+     */
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                drawer.openDrawer(GravityCompat.START);
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    /*
+     * Closes drawer when item is pressed
+     */
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
-        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
 
+    /*
+     * Closer drawer on back button press
+     */
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
             super.onBackPressed();
         }
     }
-
 }
 
