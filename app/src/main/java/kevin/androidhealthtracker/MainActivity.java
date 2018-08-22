@@ -122,6 +122,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void setUserToTextView() {
+        userName = prefs.getString("userName", null);
+        userId = prefs.getInt("userId", 0);
         name.setText("Username: " + userName + " ID: " + userId);
     }
 
