@@ -17,6 +17,10 @@ import com.kevin.healthtracker.datamodels.dto.StatusDTO;
 
 import org.springframework.web.client.ResourceAccessException;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
 import kevin.androidhealthtracker.MainActivity;
 import kevin.androidhealthtracker.R;
 import kevin.androidhealthtracker.WebClient;
@@ -27,7 +31,7 @@ public class UserFeedFragment extends Fragment {
     private UserFeedRefreshTask userFeedRefreshTask;
     private WebClient client;
     private SharedPreferences prefs;
-    private StatusDTO[] statusList;
+    private List<StatusDTO> statusList;
 
     private View view;
     private ListView listView;
@@ -109,7 +113,7 @@ public class UserFeedFragment extends Fragment {
         @Override
         protected Boolean doInBackground(Void... voids) {
             try {
-                statusList = client.getStatusFromFriendsForUser(prefs.getInt("userId", 0), 1);
+                statusList = Arrays.asList(client.getStatusFromFriendsForUser(prefs.getInt("userId", 0), 1));
             } catch (ResourceAccessException e) {
                 e.printStackTrace();
             }
@@ -120,6 +124,7 @@ public class UserFeedFragment extends Fragment {
         protected void onPostExecute(Boolean aBoolean) {
             super.onPostExecute(aBoolean);
             try {
+                Collections.reverse(statusList);
                 StatusListAdapter customListViewAdapter = new StatusListAdapter(getActivity(), statusList);
                 listView.setAdapter(customListViewAdapter);
             } catch (NullPointerException e) {

@@ -12,16 +12,18 @@ import android.widget.TextView;
 
 import com.kevin.healthtracker.datamodels.dto.StatusDTO;
 
+import java.util.List;
+
 import kevin.androidhealthtracker.R;
 
 public class StatusListAdapter extends ArrayAdapter<StatusDTO> {
 
-    private StatusDTO statusDTO[];
     private Activity context;
+    private List<StatusDTO> statusDTOList;
 
-    public StatusListAdapter(@NonNull Activity context, StatusDTO statusDTO[]) {
+    public StatusListAdapter(@NonNull Activity context, List<StatusDTO> statusDTO) {
         super(context, R.layout.status_listview_item, statusDTO);
-        this.statusDTO = statusDTO;
+        this.statusDTOList = statusDTO;
         this.context = context;
     }
 
@@ -35,8 +37,8 @@ public class StatusListAdapter extends ArrayAdapter<StatusDTO> {
         TextView userNameTextView = convertView.findViewById(R.id.userNameTextView);
         TextView statusTextView = convertView.findViewById(R.id.statusContentTextView);
 
-        userNameTextView.setText("User id: " + statusDTO[position].getUserId());
-        statusTextView.setText(statusDTO[position].getContent());
+        userNameTextView.setText("User id: " + statusDTOList.get(position).getUserId());
+        statusTextView.setText(statusDTOList.get(position).getContent());
         return convertView;
     }
 
