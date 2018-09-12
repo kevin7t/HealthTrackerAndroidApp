@@ -64,6 +64,28 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
+                <android.support.design.widget.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <EditText
+                        android:id="@+id/passwordConfirm"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/password_confirm"
+                        android:imeActionId="6"
+                        android:imeActionLabel="@string/action_sign_in_short"
+                        android:imeOptions="actionUnspecified"
+                        android:inputType="textPassword"
+                        android:maxLines="1"
+                        android:paddingBottom="8dp"
+                        android:paddingTop="8dp"
+                        android:singleLine="true"
+                        android:textColorHint="@color/colorWhite"
+                        android:theme="@style/TextLabel" />
+
+                </android.support.design.widget.TextInputLayout>
+
                 <EditText
                     android:id="@+id/password"
                     android:layout_width="match_parent"
@@ -87,17 +109,6 @@
                 style="?android:textAppearanceSmall"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                android:background="@color/colorPrimaryDark"
-                android:text="@string/action_sign_in_short"
-                android:textColor="@color/colorWhite"
-                android:textStyle="bold" />
-
-            <Button
-                android:id="@+id/email_register_button"
-                style="?android:textAppearanceSmall"
-                android:layout_width="wrap_content"
-                android:layout_height="23dp"
                 android:layout_marginTop="24dp"
                 android:background="@color/colorPrimaryDark"
                 android:text="@string/action_register"
