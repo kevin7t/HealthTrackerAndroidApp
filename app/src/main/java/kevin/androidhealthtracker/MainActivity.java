@@ -25,21 +25,51 @@ import kevin.androidhealthtracker.fragments.FragmentTwo;
 import kevin.androidhealthtracker.fragments.UserFeedFragment;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+    public static SharedPreferences prefs;
+    public static WebClient client;
+    private static final int LOGIN_REQUEST_CODE = 0;
+
     private FragmentTransaction transaction = getFragmentManager().beginTransaction().setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out);
     private Fragment fragment;
     private String sessionToken;
     private String userName;
-    public static SharedPreferences prefs;
-    public static WebClient client;
     private DrawerLayout drawer;
     private TextView name;
     private View headerView;
     private NavigationView navigationView;
-
     private int userId;
-    private static final int LOGIN_REQUEST_CODE = 0;
     private BottomNavigationView bottomNavigationView;
     private Toolbar toolbar;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        client = new WebClient(new RestTemplate(), "10.0.2.2", 8080);
+        prefs = getSharedPreferences("SharedPreferences", MODE_PRIVATE);
+        sessionToken = autoLoginPreviousUser();
+        setContentView(R.layout.main);
+
+        toolbar = findViewById(R.id.toolbar);
+        navigationView = findViewById(R.id.nav_view);
+        headerView = navigationView.getHeaderView(0);
+        bottomNavigationView = findViewById(R.id.bottom_navigation);
+        drawer = findViewById(R.id.drawer_layout);
+        name = headerView.findViewById(R.id.userName);
+
+        bottomNavigationView.setSelectedItemId(R.id.fragment_home);
+        navigationView.setNavigationItemSelectedListener(this);
+        bottomNavigationView.setOnNavigationItemSelectedListener(navigationItemSelectedListener);
+        headerView.setOnClickListener(loginOnClickListener);
+
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.addDrawerListener(toggle);
+        toggle.syncState();
+        setSupportActionBar(toolbar);
+        loadMainFragment();
+        setUserToTextView();
+    }
+
     /*
      * Fragment switcher
      */
@@ -71,46 +101,18 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             return true;
         }
     };
+
     /*
      * Start login activity
      */
     private View.OnClickListener loginOnClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
+            //Todo if user = logged in, enable log out option via pop up ok and cancel
             Intent login = new Intent(MainActivity.this, LoginActivity.class);
             startActivityForResult(login, LOGIN_REQUEST_CODE);
         }
     };
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        client = new WebClient(new RestTemplate(), "10.0.2.2", 8080);
-        prefs = getSharedPreferences("SharedPreferences", MODE_PRIVATE);
-        sessionToken = autoLoginPreviousUser();
-        setContentView(R.layout.main);
-
-        toolbar = findViewById(R.id.toolbar);
-        navigationView = findViewById(R.id.nav_view);
-        bottomNavigationView = findViewById(R.id.bottom_navigation);
-        bottomNavigationView.setSelectedItemId(R.id.fragment_home);
-        headerView = navigationView.getHeaderView(0);
-        drawer = findViewById(R.id.drawer_layout);
-        name = headerView.findViewById(R.id.userName);
-        setUserToTextView();
-
-        navigationView.setNavigationItemSelectedListener(this);
-        bottomNavigationView.setOnNavigationItemSelectedListener(navigationItemSelectedListener);
-        headerView.setOnClickListener(loginOnClickListener);
-
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.addDrawerListener(toggle);
-        toggle.syncState();
-        setSupportActionBar(toolbar);
-        loadMainFragment();
-    }
 
     private void loadMainFragment() {
         transaction = getFragmentManager().beginTransaction();
@@ -136,7 +138,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     /*
-     * After user login login
+     * After user login success
      */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {

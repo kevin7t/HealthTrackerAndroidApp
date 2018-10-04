@@ -3,28 +3,18 @@ package kevin.androidhealthtracker;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
-import android.content.pm.PackageManager;
-import android.support.annotation.NonNull;
-import android.support.design.widget.Snackbar;
-import android.support.v7.app.AppCompatActivity;
 import android.app.LoaderManager.LoaderCallbacks;
-
-import android.content.CursorLoader;
 import android.content.Loader;
 import android.database.Cursor;
-import android.net.Uri;
 import android.os.AsyncTask;
-
 import android.os.Build;
 import android.os.Bundle;
-import android.provider.ContactsContract;
+import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.inputmethod.EditorInfo;
-import android.widget.ArrayAdapter;
-import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -34,87 +24,84 @@ import com.kevin.healthtracker.datamodels.User;
 
 import org.springframework.web.client.RestClientException;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import static android.Manifest.permission.READ_CONTACTS;
-
 /**
- * A login screen that offers login via email/password.
+ * A registration screen that offers registration via username/password.
  */
 public class RegisterActivity extends AppCompatActivity implements LoaderCallbacks<Cursor> {
     /**
      * Keep track of the login task to ensure we can cancel it if requested.
      */
-    private UserLoginTask mAuthTask = null;
+    private UserRegistrationTask mAuthTask = null;
+    private WebClient client;
 
     // UI references.
-    private EditText mEmailView;
+    private EditText mUserNameView;
     private EditText mPasswordView;
     private EditText mPasswordConfirmView;
     private View mProgressView;
     private View mLoginFormView;
-    private WebClient client;
+    private Button mRegistrationButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
-        // Set up the login form.
-        mEmailView = findViewById(R.id.usernameInput);
-        mPasswordView = findViewById(R.id.password);
-        mPasswordConfirmView = findViewById(R.id.passwordConfirm);
         client = MainActivity.client;
 
+        // Set up the login form.
+        mUserNameView = findViewById(R.id.usernameInput);
         mPasswordView = findViewById(R.id.password);
-        mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
-                if (id == EditorInfo.IME_ACTION_DONE || id == EditorInfo.IME_NULL) {
-                    attemptLogin();
-                    return true;
-                }
-                return false;
-            }
-        });
-
-        Button mEmailSignInButton = findViewById(R.id.email_sign_in_button);
-        mEmailSignInButton.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                attemptLogin();
-            }
-        });
-
+        mPasswordConfirmView = findViewById(R.id.passwordConfirm);
+        mRegistrationButton = findViewById(R.id.registration_button);
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
+
+        mPasswordView.setOnEditorActionListener(passwordOnEditorActionListener);
+        mRegistrationButton.setOnClickListener(registrationOnClickListener);
     }
 
+    /**
+     * Create OnClickListeners
+     */
+    private TextView.OnEditorActionListener passwordOnEditorActionListener = new TextView.OnEditorActionListener() {
+        @Override
+        public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
+            if (id == EditorInfo.IME_ACTION_DONE || id == EditorInfo.IME_NULL) {
+                attemptRegistration();
+                return true;
+            }
+            return false;
+        }
+    };
 
-
+    private OnClickListener registrationOnClickListener = new OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            attemptRegistration();
+        }
+    };
 
     /**
      * Attempts to sign in or register the account specified by the login form.
      * If there are form errors (invalid email, missing fields, etc.), the
      * errors are presented and no actual login attempt is made.
      */
-    private void attemptLogin() {
+    private void attemptRegistration() {
+        boolean cancel = false;
+        View focusView = null;
+
+        String userName = mUserNameView.getText().toString();
+        String password = mPasswordView.getText().toString();
+        String passwordConfirm = mPasswordConfirmView.getText().toString();
+        User user = new User();
+
         if (mAuthTask != null) {
             return;
         }
 
         // Reset errors.
-        mEmailView.setError(null);
+        mUserNameView.setError(null);
         mPasswordView.setError(null);
-
-        // Store values at the time of the login attempt.
-        String email = mEmailView.getText().toString();
-        String password = mPasswordView.getText().toString();
-        String passwordConfirm = mPasswordConfirmView.getText().toString();
-        User user = new User();
-
-        boolean cancel = false;
-        View focusView = null;
 
         // Check for a valid password, if the user entered one.
         if (!TextUtils.isEmpty(password) && !isPasswordValid(password)) {
@@ -122,22 +109,11 @@ public class RegisterActivity extends AppCompatActivity implements LoaderCallbac
             focusView = mPasswordView;
             cancel = true;
         }
+        //Validate password matches
         if (password.equals(passwordConfirm)){
-            user.setUserName(email);
+            user.setUserName(userName);
             user.setPassword(password);
         }
-
-        // Check for a valid email address.
-//        if (TextUtils.isEmpty(email)) {
-//            mEmailView.setError(getString(R.string.error_field_required));
-//            focusView = mEmailView;
-//            cancel = true;
-//        } else if (!isEmailValid(email)) {
-//            mEmailView.setError(getString(R.string.error_invalid_email));
-//            focusView = mEmailView;
-//            cancel = true;
-//        }
-
         if (cancel) {
             // There was an error; don't attempt login and focus the first
             // form field with an error.
@@ -146,19 +122,9 @@ public class RegisterActivity extends AppCompatActivity implements LoaderCallbac
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
             showProgress(true);
-            mAuthTask = new UserLoginTask(user);
-            mAuthTask.execute((Void) null);
+            mAuthTask = new UserRegistrationTask(user);
+            mAuthTask.execute();
         }
-    }
-
-    private boolean isEmailValid(String email) {
-        //TODO: Replace this with your own logic
-        return email.contains("@");
-    }
-
-    private boolean isPasswordValid(String password) {
-        //TODO: Replace this with your own logic
-        return password.length() > 4;
     }
 
     /**
@@ -210,48 +176,33 @@ public class RegisterActivity extends AppCompatActivity implements LoaderCallbac
     public void onLoaderReset(Loader<Cursor> cursorLoader) {
     }
 
+    private boolean isPasswordValid(String password) {
+        return password.length() > 4;
+    }
 
-    /**
-     * Represents an asynchronous login/registration task used to authenticate
-     * the user.
-     */
-    public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
+    public class UserRegistrationTask extends AsyncTask<Void, Void, Boolean> {
         private User user;
 
-        UserLoginTask(User user) {
+        UserRegistrationTask(User user) {
             this.user = user;
         }
 
         @Override
-        protected Boolean doInBackground(Void... params) {
+        protected Boolean doInBackground(Void... voids) {
             try{
                 user = client.registerUser(user);
             }catch (RestClientException e){
                 Toast error = new Toast(RegisterActivity.this);
                 error.makeText(RegisterActivity.this, e.toString(), Toast.LENGTH_LONG).show();
             }
-
-            // TODO: register the new account here.
             return true;
         }
 
         @Override
         protected void onPostExecute(final Boolean success) {
-            mAuthTask = null;
-            showProgress(false);
-
             if (success) {
                 finish();
-            } else {
-                mPasswordView.setError(getString(R.string.error_incorrect_password));
-                mPasswordView.requestFocus();
             }
-        }
-
-        @Override
-        protected void onCancelled() {
-            mAuthTask = null;
-            showProgress(false);
         }
     }
 }

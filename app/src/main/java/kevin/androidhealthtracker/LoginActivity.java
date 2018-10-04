@@ -27,81 +27,75 @@ import com.kevin.healthtracker.datamodels.User;
 
 import org.springframework.web.client.RestClientException;
 
-import java.io.IOException;
-import java.util.Properties;
-
-import kevin.androidhealthtracker.util.PropertyReader;
-
 /**
- * A login screen that offers login via email/password.
+ * A login screen that offers login via username/password.
  */
 public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<Cursor> {
-    private Properties properties;
-    private PropertyReader propertyReader;
-    private Context context;
-    private WebClient client;
     /**
      * Keep track of the login task to ensure we can cancel it if requested.
      */
     private UserLoginTask mAuthTask = null;
 
+    private Context context;
+    private WebClient client;
+
     // UI references.
-    private EditText mEmailView;
+    private EditText mUserNameView;
     private EditText mPasswordView;
     private View mProgressView;
     private View mLoginFormView;
+    private Button mEmailSignInButton;
+    private Button mRegistrationButton;
 
     @RequiresApi(api = Build.VERSION_CODES.CUPCAKE)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+        client = MainActivity.client;
+        context = this;
 
         // Set up the login form.
-        mEmailView = findViewById(R.id.usernameInput);
+        mUserNameView = findViewById(R.id.usernameInput);
         mPasswordView = findViewById(R.id.password);
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
-        context = this;
-        //TODO: Add this as properties
-        client = MainActivity.client;
+        mEmailSignInButton = findViewById(R.id.email_sign_in_button);
+        mRegistrationButton = findViewById(R.id.email_register_button);
 
-        try {
-            properties = new PropertyReader(this, properties).getProperties("app.properties");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
-                if (id == EditorInfo.IME_ACTION_DONE || id == EditorInfo.IME_NULL) {
-                    attemptLogin();
-                    return true;
-                }
-                return false;
-            }
-        });
-
-        //Authenticate the user with the server
-        Button mEmailSignInButton = findViewById(R.id.email_sign_in_button);
-        mEmailSignInButton.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                attemptLogin();
-            }
-        });
-
-        Button mRegistrationBUtton = findViewById(R.id.email_register_button);
-        mRegistrationBUtton.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent registrationIntent = new Intent(LoginActivity.this, RegisterActivity.class);
-                startActivity(registrationIntent);
-            }
-        });
-
+        mPasswordView.setOnEditorActionListener(passwordOnEditorActionListener);
+        mEmailSignInButton.setOnClickListener(emailSignInButtonOnClickListener);
+        mRegistrationButton.setOnClickListener(registrationButtonOnClickListener);
     }
+
+    /**
+     * Create OnClickListeners
+     */
+    private TextView.OnEditorActionListener passwordOnEditorActionListener = new TextView.OnEditorActionListener() {
+        @Override
+        public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
+            if (id == EditorInfo.IME_ACTION_DONE || id == EditorInfo.IME_NULL) {
+                attemptLogin();
+                return true;
+            }
+            return false;
+        }
+    };
+
+    private OnClickListener emailSignInButtonOnClickListener = new OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            attemptLogin();
+        }
+    };
+
+    private OnClickListener registrationButtonOnClickListener = new OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            Intent registrationIntent = new Intent(LoginActivity.this, RegisterActivity.class);
+            startActivity(registrationIntent);
+        }
+    };
 
     /**
      * Attempts to sign in or register the account specified by the login form.
@@ -109,20 +103,22 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
      * errors are presented and no actual login attempt is made.
      */
     private void attemptLogin() {
-
-        mEmailView.setError(null);
-        mPasswordView.setError(null);
-        String email = mEmailView.getText().toString();
-        String password = mPasswordView.getText().toString();
         boolean cancel = false;
         View focusView = null;
+
+        String userName = mUserNameView.getText().toString();
+        String password = mPasswordView.getText().toString();
         User user = new User();
-        user.setUserName(email);
+        user.setUserName(userName);
         user.setPassword(password);
 
         if (mAuthTask != null) {
             return;
         }
+
+        // Reset errors.
+        mUserNameView.setError(null);
+        mPasswordView.setError(null);
 
         // Check for a valid password, if the user entered one.
         if (!TextUtils.isEmpty(password) && !isPasswordValid(password)) {
@@ -130,17 +126,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             focusView = mPasswordView;
             cancel = true;
         }
-        // Check for a valid email address.
-//        if (TextUtils.isEmpty(email)) {
-//            mEmailView.setError(getString(R.string.error_field_required));
-//            focusView = mEmailView;
-//            cancel = true;
-//        } else if (!isEmailValid(email)) {
-//            mEmailView.setError(getString(R.string.error_invalid_email));
-//            focusView = mEmailView;
-//            cancel = true;
-//        }
-
         if (cancel) {
             // There was an error; don't attempt login and focus the first
             // form field with an error.
@@ -190,10 +175,23 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         }
     }
 
-    /**
-     * Represents an asynchronous login/registration task used to authenticate
-     * the user.
-     */
+    @Override
+    public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
+        return null;
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+    }
+
+    private boolean isPasswordValid(String password) {
+        return password.length() > 4;
+    }
+
     public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
         private User user;
 
@@ -208,7 +206,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             }catch (RestClientException e){
                 System.out.println(e.getMessage());
             }
-
             return true;
         }
 
@@ -216,7 +213,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         protected void onPostExecute(final Boolean success) {
             mAuthTask = null;
             showProgress(false);
-
             if (success) {
                 SharedPreferences.Editor editor = getSharedPreferences("SharedPreferences", Context.MODE_PRIVATE).edit();
                 editor.putInt("userId", user.getId());
@@ -236,27 +232,5 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             showProgress(false);
         }
     }
-
-    @Override
-    public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
-        return null;
-    }
-
-    @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
-    }
-
-    @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
-    }
-
-    private boolean isEmailValid(String email) {
-        return email.matches("[a-zA-Z1-9]+@[a-zA-z]+[.][a-zA-Z]+");
-    }
-
-    private boolean isPasswordValid(String password) {
-        return password.length() > 4;
-    }
-
 }
 
