@@ -217,6 +217,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 SharedPreferences.Editor editor = getSharedPreferences("SharedPreferences", Context.MODE_PRIVATE).edit();
                 editor.putInt("userId", user.getId());
                 editor.putString("userName", user.getUserName());
+                editor.putBoolean("loggedIn", true);
                 editor.apply();
                 setResult(RESULT_OK);
                 finish();

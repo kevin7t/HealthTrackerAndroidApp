@@ -1,6 +1,7 @@
 package kevin.androidhealthtracker;
 
 import android.app.Fragment;
+import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -22,6 +23,7 @@ import org.springframework.web.client.RestTemplate;
 
 import kevin.androidhealthtracker.fragments.FragmentThree;
 import kevin.androidhealthtracker.fragments.FragmentTwo;
+import kevin.androidhealthtracker.fragments.OkCancelFragment;
 import kevin.androidhealthtracker.fragments.UserFeedFragment;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
@@ -40,6 +42,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private int userId;
     private BottomNavigationView bottomNavigationView;
     private Toolbar toolbar;
+    private Boolean loggedIn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -103,14 +106,27 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     };
 
     /*
+     * Show alert dialog
+     */
+    private void showAlertDialog() {
+        FragmentManager fragmentManager = getFragmentManager();
+        OkCancelFragment okCancelFragment = new OkCancelFragment();
+        okCancelFragment.show(fragmentManager, "OkCancel");
+    }
+
+    /*
      * Start login activity
      */
     private View.OnClickListener loginOnClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
             //Todo if user = logged in, enable log out option via pop up ok and cancel
-            Intent login = new Intent(MainActivity.this, LoginActivity.class);
-            startActivityForResult(login, LOGIN_REQUEST_CODE);
+            if (loggedIn) {
+                showAlertDialog();
+            } else {
+                Intent login = new Intent(MainActivity.this, LoginActivity.class);
+                startActivityForResult(login, LOGIN_REQUEST_CODE);
+            }
         }
     };
 
@@ -126,6 +142,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private void setUserToTextView() {
         userName = prefs.getString("userName", null);
         userId = prefs.getInt("userId", 0);
+        loggedIn = prefs.getBoolean("loggedIn", false);
         name.setText("Username: " + userName + " ID: " + userId);
     }
 
@@ -147,6 +164,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             if (resultCode == RESULT_OK) {
                 userName = prefs.getString("userName", null);
                 userId = prefs.getInt("userId", 0);
+                loggedIn = prefs.getBoolean("loggedIn", false);
                 Toast loggedIn = new Toast(this);
                 loggedIn.makeText(this, userName + " " + userId, Toast.LENGTH_LONG).show();
                 setUserToTextView();
