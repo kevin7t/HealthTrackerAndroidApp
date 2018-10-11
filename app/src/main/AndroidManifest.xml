@@ -29,7 +29,11 @@
             android:label="@string/title_activity_login" />
         <activity
             android:name=".RegisterActivity"
-            android:label="@string/title_activity_register"></activity>
+            android:label="@string/title_activity_register" />
+        <activity
+            android:name=".NewStatusActivity"
+            android:label="@string/title_activity_new_status"
+            android:theme="@style/AppTheme"></activity>
     </application>
 
 </manifest>

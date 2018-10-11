@@ -41,7 +41,7 @@ dependencies {
 
     api 'com.fasterxml.jackson.core:jackson-databind:2.9.2'
     api 'com.android.volley:volley:1.0.0'
-    api ('com.kevin.healthtracker:Datamodels:1.0')
+    api('com.kevin.healthtracker:Datamodels:1.0')
     api 'org.springframework.android:spring-android-rest-template:2.0.0.M3'
 
 }

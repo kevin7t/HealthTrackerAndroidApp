@@ -18,6 +18,7 @@ import com.kevin.healthtracker.datamodels.dto.StatusDTO;
 import org.springframework.web.client.ResourceAccessException;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import kevin.androidhealthtracker.MainActivity;
@@ -104,6 +105,13 @@ public class UserFeedFragment extends Fragment {
         public void onClick(View view) {
             Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                     .setAction("Action", null).show();
+            /**Create new activity to post a new status
+             * Open new activity
+             * Pass in user id
+             * then call client
+             * subject and workout and stuff
+             * and then execute async task and then exit activity back to this one and refresh
+             */
         }
     };
 
@@ -122,6 +130,7 @@ public class UserFeedFragment extends Fragment {
         protected void onPostExecute(Boolean aBoolean) {
             super.onPostExecute(aBoolean);
             try {
+                Collections.reverse(statusList);
                 StatusListAdapter customListViewAdapter = new StatusListAdapter(getActivity(), statusList);
                 listView.setAdapter(customListViewAdapter);
             } catch (NullPointerException e) {

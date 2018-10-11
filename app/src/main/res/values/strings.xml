@@ -30,4 +30,5 @@
         completions."
     </string>
     <string name="title_activity_register">Register</string>
+    <string name="title_activity_new_status">NewStatusActivity</string>
 </resources>
