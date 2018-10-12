@@ -1,6 +1,7 @@
 package kevin.androidhealthtracker.fragments;
 
 import android.app.Fragment;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -22,6 +23,7 @@ import java.util.Collections;
 import java.util.List;
 
 import kevin.androidhealthtracker.MainActivity;
+import kevin.androidhealthtracker.NewStatusActivity;
 import kevin.androidhealthtracker.R;
 import kevin.androidhealthtracker.WebClient;
 import kevin.androidhealthtracker.adapters.StatusListAdapter;
@@ -105,6 +107,8 @@ public class UserFeedFragment extends Fragment {
         public void onClick(View view) {
             Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                     .setAction("Action", null).show();
+            Intent newStatusIntent = new Intent(getActivity(), NewStatusActivity.class);
+            startActivity(newStatusIntent);
             /**Create new activity to post a new status
              * Open new activity
              * Pass in user id

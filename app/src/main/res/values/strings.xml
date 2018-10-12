@@ -31,4 +31,7 @@
     </string>
     <string name="title_activity_register">Register</string>
     <string name="title_activity_new_status">NewStatusActivity</string>
+
+    <string name="new_status">Create a new status</string>
+    <string name="post_status">Post</string>
 </resources>
