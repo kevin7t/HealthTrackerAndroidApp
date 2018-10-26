@@ -34,7 +34,7 @@
         tools:showIn="@layout/activity_new_status">
 
         <TextView
-            android:id="@+id/textView4"
+            android:id="@+id/usernameView"
             android:layout_width="89dp"
             android:layout_height="22dp"
             android:layout_marginStart="4dp"
@@ -54,17 +54,27 @@
             app:srcCompat="@android:drawable/btn_star_big_on" />
 
         <EditText
-            android:id="@+id/editText"
+            android:id="@+id/statusContentTextView"
             android:layout_width="346dp"
             android:layout_height="56dp"
+            android:layout_marginTop="8dp"
             android:ems="10"
             android:hint="@string/new_status"
-            android:inputType="textPersonName"
+            android:inputType="text|textPersonName"
             android:textAlignment="textStart"
             android:textColor="@android:color/primary_text_light"
             android:textColorHint="@color/colorSecondaryText"
             app:layout_constraintStart_toStartOf="@+id/imageView"
             app:layout_constraintTop_toBottomOf="@+id/imageView" />
+
+        <Spinner
+            android:id="@+id/statusTypeSpinner"
+            android:layout_width="190dp"
+            android:layout_height="46dp"
+            android:layout_marginStart="76dp"
+            android:layout_marginTop="32dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
     </android.support.constraint.ConstraintLayout>
 

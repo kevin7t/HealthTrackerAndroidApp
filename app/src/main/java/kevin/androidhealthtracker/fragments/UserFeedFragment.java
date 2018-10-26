@@ -123,6 +123,7 @@ public class UserFeedFragment extends Fragment {
         @Override
         protected Boolean doInBackground(Void... voids) {
             try {
+                //TODO Must sort by date time because status does not show in proper order
                 statusList = Arrays.asList(client.getStatusFromFriendsForUser(prefs.getInt("userId", 0), 1));
             } catch (ResourceAccessException e) {
                 e.printStackTrace();

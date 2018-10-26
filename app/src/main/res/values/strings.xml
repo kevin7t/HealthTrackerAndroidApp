@@ -34,4 +34,14 @@
 
     <string name="new_status">Create a new status</string>
     <string name="post_status">Post</string>
+
+    <string-array name="status_type">
+        <item>Walk</item>
+        <item>Run</item>
+        <item>Sprint</item>
+        <item>Swim</item>
+        <item>Bike</item>
+        <item>Row</item>
+        <item>Weights</item>
+    </string-array>
 </resources>

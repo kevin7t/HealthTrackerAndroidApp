@@ -79,7 +79,7 @@ public class WebClient {
      * User feed functions
      */
 
-    public StatusDTO addStatus(StatusDTO statusDTO) {
+    public StatusDTO createStatus(StatusDTO statusDTO) {
         return restTemplate.postForObject(url + "/feed/status", statusDTO, StatusDTO.class);
     }
 
