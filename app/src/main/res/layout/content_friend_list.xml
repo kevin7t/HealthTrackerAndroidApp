@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/colorGrey"
-    tools:context="kevin.androidhealthtracker.MainActivity">
+    tools:context="kevin.androidhealthtracker.FriendListActivity">
 
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
@@ -28,17 +28,18 @@
         android:layout_height="match_parent"
         android:background="@color/colorGrey"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        tools:showIn="@layout/content">
+        tools:showIn="@layout/content_main">
 
-        <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-            android:id="@+id/fragment_container"
+
+        <ListView
+            android:id="@+id/friendsListview"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_above="@id/bottom_navigation" />
-
+            android:layout_height="456dp"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true" />
 
         <android.support.design.widget.BottomNavigationView
-            android:id="@+id/bottom_navigation"
+            android:id="@+id/friendlist_bottom_navigation"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
@@ -47,7 +48,9 @@
             app:itemBackground="@color/colorWhite"
             app:itemIconTint="@drawable/selector_colors"
             app:itemTextColor="@drawable/selector_colors"
-            app:menu="@menu/fragment_drawer" />
+            app:menu="@menu/friendlist_fragment_drawer" >
+
+        </android.support.design.widget.BottomNavigationView>
 
     </RelativeLayout>
 

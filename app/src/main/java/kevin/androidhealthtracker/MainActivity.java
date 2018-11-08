@@ -50,7 +50,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         client = new WebClient(new RestTemplate(), "10.0.2.2", 8080);
         prefs = getSharedPreferences("SharedPreferences", MODE_PRIVATE);
         sessionToken = autoLoginPreviousUser();
-        setContentView(R.layout.main);
+        setContentView(R.layout.activity_main);
 
         toolbar = findViewById(R.id.toolbar);
         navigationView = findViewById(R.id.nav_view);
@@ -120,7 +120,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private View.OnClickListener loginOnClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
-            //Todo if user = logged in, enable log out option via pop up ok and cancel
             if (loggedIn) {
                 showAlertDialog();
             } else {
@@ -166,7 +165,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 userId = prefs.getInt("userId", 0);
                 loggedIn = prefs.getBoolean("loggedIn", false);
                 Toast loggedIn = new Toast(this);
-                loggedIn.makeText(this, userName + " " + userId, Toast.LENGTH_LONG).show();
+                Toast.makeText(this, userName + " " + userId, Toast.LENGTH_LONG).show();
                 setUserToTextView();
                 loadMainFragment();
             }
@@ -193,6 +192,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
+        //TODO IF NAVIGATION = FRIEND ACTIVITY THEN OPEN THE ACVITIY AND CLOSE DRAWER
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }

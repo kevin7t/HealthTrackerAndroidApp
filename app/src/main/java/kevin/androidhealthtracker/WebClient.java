@@ -33,6 +33,9 @@ public class WebClient {
     public User getUser(int id) {
         return restTemplate.getForObject(url + "/users/" + id, User.class);
     }
+    public User getUserByUserName(String userName) {
+        return restTemplate.getForObject(url + "//searchuser//" + userName, User.class);
+    }
 
     public User[] getAllUsers() {
         return restTemplate.getForObject(url + "/users", User[].class);

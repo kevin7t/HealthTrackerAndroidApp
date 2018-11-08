@@ -44,4 +44,6 @@
         <item>Row</item>
         <item>Weights</item>
     </string-array>
+    <string name="title_activity_friend_list">FriendListActivity</string>
+
 </resources>

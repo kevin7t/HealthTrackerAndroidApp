@@ -13,12 +13,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.kevin.healthtracker.datamodels.StatusType;
-import com.kevin.healthtracker.datamodels.User;
 import com.kevin.healthtracker.datamodels.dto.StatusDTO;
 
 import org.springframework.web.client.RestClientException;
-
-import java.lang.reflect.Array;
 
 public class NewStatusActivity extends AppCompatActivity {
 
@@ -93,12 +90,22 @@ public class NewStatusActivity extends AppCompatActivity {
         return statusType;
     }
 
+    /**
+     * Inflate top menu to allow buttons to be shown
+     * @param menu
+     * @return
+     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.post_status, menu);
+        getMenuInflater().inflate(R.menu.menu_new_status, menu);
         return true;
     }
 
+    /**
+     *
+     * @param item
+     * @return
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
@@ -132,7 +139,7 @@ public class NewStatusActivity extends AppCompatActivity {
                 client.createStatus(status);
             } catch (RestClientException e) {
                 Toast error = new Toast(NewStatusActivity.this);
-                error.makeText(NewStatusActivity.this, e.toString(), Toast.LENGTH_LONG).show();
+                Toast.makeText(NewStatusActivity.this, e.toString(), Toast.LENGTH_LONG).show();
             }
             return true;
         }
