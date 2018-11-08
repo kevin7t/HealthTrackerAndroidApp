@@ -70,8 +70,8 @@ public class WebClient {
         return restTemplate.getForObject(url + "/users/getinboundrequests/" + user1Id, Friend[].class);
     }
 
-    public Friend[] getAllFriends(int user1Id) {
-        return restTemplate.getForObject(url + "/users/getallrelations/" + user1Id, Friend[].class);
+    public User[] getAllFriends(int user1Id) {
+        return restTemplate.getForObject(url + "/users/getallrelations/" + user1Id, User[].class);
     }
 
     public Friend getFriend(int user1Id, int user2Id) {

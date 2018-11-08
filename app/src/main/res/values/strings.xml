@@ -4,6 +4,7 @@
     <string name="title_dashboard">Fragment 2 </string>
     <string name="title_notifications">Notifications</string>
     <string name="title_activity_main2">Main2Activity</string>
+    <string name="title_activity_friendlist">Friends list</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>

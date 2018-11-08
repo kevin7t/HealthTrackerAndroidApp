@@ -6,12 +6,12 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.SearchView;
 import android.widget.Toast;
 
 import com.kevin.healthtracker.datamodels.Friend;
@@ -22,6 +22,7 @@ import org.springframework.web.client.RestClientException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class FriendListActivity extends AppCompatActivity {
     private BottomNavigationView bottomNavigationView;
@@ -52,7 +53,7 @@ public class FriendListActivity extends AppCompatActivity {
         bottomNavigationView.setOnNavigationItemSelectedListener(navigationItemSelectedListener);
 
         friendListView = findViewById(R.id.friendsListview);
-
+        populateListFriends();
 
     }
 
@@ -84,13 +85,13 @@ public class FriendListActivity extends AppCompatActivity {
     private SearchView.OnQueryTextListener onQueryTextListener = new SearchView.OnQueryTextListener() {
         @Override
         public boolean onQueryTextSubmit(String query) {
-            return false;
+//            GetUserByName getUserByName = new GetUserByName(query);
+//            getUserByName.execute();
+            return true;
         }
 
         @Override
         public boolean onQueryTextChange(String newText) {
-            //GET Request
-            //Repopulate arraylist with new data
             return false;
         }
     };
@@ -113,10 +114,12 @@ public class FriendListActivity extends AppCompatActivity {
     };
 
     public class GetAllFriendsTask extends AsyncTask<Void, Void, Boolean> {
+         List<String> userNames = new ArrayList<>();
+
         @Override
         protected Boolean doInBackground(Void... voids) {
             try {
-                friendsList = Arrays.asList(client.getAllFriends(userId));
+                userNames = Arrays.asList(client.getAllFriends(userId)).stream().map(user -> user.getUserName()).collect(Collectors.toList());
             } catch (RestClientException e) {
                 Toast error = new Toast(FriendListActivity.this);
                 Toast.makeText(FriendListActivity.this, e.toString(), Toast.LENGTH_LONG).show();
@@ -127,9 +130,7 @@ public class FriendListActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(final Boolean success) {
             if (success) {
-                final ArrayList<String> userNames = new ArrayList<>();
-                friendsList.forEach(friend -> userNames.add(friend.getUser2().getUserName()));
-                arrayAdapter = new ArrayAdapter<>(FriendListActivity.this, android.R.layout.simple_list_item_1, userNames);
+                arrayAdapter = new ArrayAdapter<>(FriendListActivity.this, R.layout.all_friends_listview_item, userNames);
                 friendListView.setAdapter(arrayAdapter);
             }
         }
@@ -171,8 +172,9 @@ public class FriendListActivity extends AppCompatActivity {
             try {
                 user = client.getUserByUserName(userName);
             } catch (RestClientException e) {
-                Toast error = new Toast(FriendListActivity.this);
-                Toast.makeText(FriendListActivity.this, e.toString(), Toast.LENGTH_LONG).show();
+                //Cannot call toast on thread that has not called looper prepare
+//                Toast error = new Toast(FriendListActivity.this);
+//                Toast.makeText(FriendListActivity.this, e.toString(), Toast.LENGTH_LONG).show();
             }
             return true;
         }

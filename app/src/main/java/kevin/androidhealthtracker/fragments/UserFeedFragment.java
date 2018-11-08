@@ -72,6 +72,7 @@ public class UserFeedFragment extends Fragment {
 
         @Override
         public void onScroll(AbsListView absListView, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+            //TODO BROKEN SCROLL UP CAUSES A REFRESH
             if (firstVisibleItem > 0) {
                 floatingActionButton.hide();
                 homeSwipeRefreshLayout.setEnabled(false);

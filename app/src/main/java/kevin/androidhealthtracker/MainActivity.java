@@ -192,7 +192,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
-        //TODO IF NAVIGATION = FRIEND ACTIVITY THEN OPEN THE ACVITIY AND CLOSE DRAWER
+        switch (item.getItemId()){
+            case R.id.friendlistMenuItem:
+                Intent friendListActivityIntent = new Intent(MainActivity.this, FriendListActivity.class);
+                startActivity(friendListActivityIntent);
+        }
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
