@@ -47,7 +47,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        client = new WebClient(new RestTemplate(), "10.0.2.2", 8080);
+//        client = new WebClient(new RestTemplate(), "10.0.2.2", 8080);
+        client = new WebClient(new RestTemplate(), "192.168.0.106", 8080);
+
         prefs = getSharedPreferences("SharedPreferences", MODE_PRIVATE);
         sessionToken = autoLoginPreviousUser();
         setContentView(R.layout.activity_main);

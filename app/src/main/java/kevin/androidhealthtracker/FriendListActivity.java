@@ -21,7 +21,10 @@ import org.springframework.web.client.RestClientException;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class FriendListActivity extends AppCompatActivity {
@@ -60,13 +63,20 @@ public class FriendListActivity extends AppCompatActivity {
     private void populateListFriends() {
         GetAllFriendsTask getAllFriendsTask = new GetAllFriendsTask();
         getAllFriendsTask.execute();
+        setTitle(R.string.my_friends);
     }
 
     private void populateListIncoming() {
         GetIncomingFriends getIncomingFriends = new GetIncomingFriends();
         getIncomingFriends.execute();
+        setTitle(R.string.incoming_requests);
     }
 
+    private void populateListOutgoing(){
+        GetOutgoingFriends getOutgoingFriends = new GetOutgoingFriends();
+        getOutgoingFriends.execute();
+        setTitle(R.string.outgoing_requests);
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -85,8 +95,9 @@ public class FriendListActivity extends AppCompatActivity {
     private SearchView.OnQueryTextListener onQueryTextListener = new SearchView.OnQueryTextListener() {
         @Override
         public boolean onQueryTextSubmit(String query) {
-//            GetUserByName getUserByName = new GetUserByName(query);
-//            getUserByName.execute();
+            GetUserByName getUserByName = new GetUserByName(query);
+            getUserByName.execute();
+            setTitle(R.string.search_friend);
             return true;
         }
 
@@ -103,11 +114,12 @@ public class FriendListActivity extends AppCompatActivity {
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
             // Handle navigation view item clicks here.
             int id = item.getItemId();
-            Class fragmentClass = null;
             if (id == R.id.myFriendsItem) {
                 populateListFriends();
             } else if (id == R.id.incomingFriendsItem) {
                 populateListIncoming();
+            }else if (id == R.id.outgoingFriendsItem){
+                populateListOutgoing();
             }
             return true;
         }
@@ -137,11 +149,22 @@ public class FriendListActivity extends AppCompatActivity {
     }
 
     public class GetIncomingFriends extends AsyncTask<Void, Void, Boolean> {
+        Map<Integer,String> user = new HashMap<>();
 
         @Override
         protected Boolean doInBackground(Void... voids) {
             try {
-                friendsList = Arrays.asList(client.getInboundRequests(userId));
+                List<Friend> friends = Arrays.asList(client.getInboundOutboundRequests(userId));
+                Iterator iterator = friends.iterator();
+                while(iterator.hasNext()){
+                    Friend friend = (Friend) iterator.next();
+                    if (friend.getUserActionId() != userId && friend.getUser1().getId() != userId){
+                        user.put(friend.getUser1().getId(),friend.getUser1().getUserName());
+                    }else if (friend.getUserActionId() != userId && friend.getUser2().getId() != userId){
+                        user.put(friend.getUser2().getId(),friend.getUser2().getUserName());
+                    }
+                }
+
             } catch (RestClientException e) {
                 Toast error = new Toast(FriendListActivity.this);
                 Toast.makeText(FriendListActivity.this, e.toString(), Toast.LENGTH_LONG).show();
@@ -153,8 +176,42 @@ public class FriendListActivity extends AppCompatActivity {
         protected void onPostExecute(final Boolean success) {
             if (success) {
                 final ArrayList<String> userNames = new ArrayList<>();
-                friendsList.forEach(friend -> userNames.add(friend.getUser1().getUserName()));
-                arrayAdapter = new ArrayAdapter<>(FriendListActivity.this, android.R.layout.simple_list_item_1, userNames);
+                userNames.addAll(user.values());
+                arrayAdapter = new ArrayAdapter<>(FriendListActivity.this, R.layout.all_friends_listview_item, userNames);
+                friendListView.setAdapter(arrayAdapter);
+            }
+        }
+    }
+    public class GetOutgoingFriends extends AsyncTask<Void, Void, Boolean> {
+        Map<Integer,String> user = new HashMap<>();
+
+        @Override
+        protected Boolean doInBackground(Void... voids) {
+            try {
+                List<Friend> friends = Arrays.asList(client.getInboundOutboundRequests(userId));
+                Iterator iterator = friends.iterator();
+                while(iterator.hasNext()){
+                    Friend friend = (Friend) iterator.next();
+                    if (friend.getUserActionId() == userId && friend.getUser1().getId() != userId){
+                        user.put(friend.getUser1().getId(),friend.getUser1().getUserName());
+                    }else if (friend.getUserActionId() == userId && friend.getUser2().getId() != userId){
+                        user.put(friend.getUser2().getId(),friend.getUser2().getUserName());
+                    }
+                }
+
+            } catch (RestClientException e) {
+                Toast error = new Toast(FriendListActivity.this);
+                Toast.makeText(FriendListActivity.this, e.toString(), Toast.LENGTH_LONG).show();
+            }
+            return true;
+        }
+
+        @Override
+        protected void onPostExecute(final Boolean success) {
+            if (success) {
+                final ArrayList<String> userNames = new ArrayList<>();
+                userNames.addAll(user.values());
+                arrayAdapter = new ArrayAdapter<>(FriendListActivity.this, R.layout.all_friends_listview_item, userNames);
                 friendListView.setAdapter(arrayAdapter);
             }
         }
@@ -184,7 +241,7 @@ public class FriendListActivity extends AppCompatActivity {
             if (success) {
                 final ArrayList<String> userNames = new ArrayList<>();
                 userNames.add(user.getUserName());
-                arrayAdapter = new ArrayAdapter<>(FriendListActivity.this, android.R.layout.simple_list_item_1, userNames);
+                arrayAdapter = new ArrayAdapter<>(FriendListActivity.this, R.layout.all_friends_listview_item, userNames);
                 friendListView.setAdapter(arrayAdapter);
             }
         }

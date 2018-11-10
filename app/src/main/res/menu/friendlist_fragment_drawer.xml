@@ -15,11 +15,11 @@
             android:icon="@drawable/ic_incoming_24dp"
             android:title="Incoming" />
 
-        <!--<item-->
-            <!--android:id="@+id/outgoingFriendsItem"-->
-            <!--android:checkable="true"-->
-            <!--android:icon="@drawable/ic_outgoing_24dp"-->
-            <!--android:title="Outgoing"/>-->
+        <item
+            android:id="@+id/outgoingFriendsItem"
+            android:checkable="true"
+            android:icon="@drawable/ic_outgoing_24dp"
+            android:title="Outgoing"/>
     </group>
 
 
