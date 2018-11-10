@@ -47,8 +47,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        client = new WebClient(new RestTemplate(), "10.0.2.2", 8080);
-        client = new WebClient(new RestTemplate(), "192.168.0.106", 8080);
+        //this is localhost
+        client = new WebClient(new RestTemplate(), "10.0.2.2", 8080);
+//        client = new WebClient(new RestTemplate(), "192.168.0.106", 8080);
 
         prefs = getSharedPreferences("SharedPreferences", MODE_PRIVATE);
         sessionToken = autoLoginPreviousUser();
@@ -148,15 +149,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private String autoLoginPreviousUser() {
-        //Get user name from shared preferences
+        //Get outgoingFriends name from shared preferences
         //Get password from shared preferences
-        //Authenticate user from server
+        //Authenticate outgoingFriends from server
         //Return session id
         return null;
     }
 
     /*
-     * After user login success
+     * After outgoingFriends login success
      */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {

@@ -1,5 +1,6 @@
 package kevin.androidhealthtracker;
 
+import android.app.FragmentManager;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -9,6 +10,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.SearchView;
@@ -27,6 +30,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import kevin.androidhealthtracker.fragments.AddFriendFragment;
+import kevin.androidhealthtracker.fragments.RespondFriendFragment;
+
 public class FriendListActivity extends AppCompatActivity {
     private BottomNavigationView bottomNavigationView;
     private SearchView searchView;
@@ -38,7 +44,14 @@ public class FriendListActivity extends AppCompatActivity {
     private int userId;
     private String userName;
 
+    private Boolean searchViewActivated = false;
+
     private ArrayAdapter<String> arrayAdapter;
+
+    private Map<Integer, String> outgoingFriends = new HashMap<>();
+    private Map<Integer, String> incomingFriends = new HashMap<>();
+    private Map<Integer, String> searchFriends = new HashMap<>();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,8 +69,8 @@ public class FriendListActivity extends AppCompatActivity {
         bottomNavigationView.setOnNavigationItemSelectedListener(navigationItemSelectedListener);
 
         friendListView = findViewById(R.id.friendsListview);
+        friendListView.setOnItemClickListener(friendListOnItemClickListener);
         populateListFriends();
-
     }
 
     private void populateListFriends() {
@@ -72,11 +85,47 @@ public class FriendListActivity extends AppCompatActivity {
         setTitle(R.string.incoming_requests);
     }
 
-    private void populateListOutgoing(){
+    private void populateListOutgoing() {
         GetOutgoingFriends getOutgoingFriends = new GetOutgoingFriends();
         getOutgoingFriends.execute();
         setTitle(R.string.outgoing_requests);
     }
+
+    private void showRespondDialog(int user1, int user2) {
+        Bundle args = new Bundle();
+        args.putInt("user1", user1);
+        args.putInt("user2", user2);
+
+        FragmentManager fragmentManager = getFragmentManager();
+        RespondFriendFragment respondFriendFragment = new RespondFriendFragment();
+        respondFriendFragment.show(fragmentManager, "respond");
+        respondFriendFragment.setArguments(args);
+    }
+
+    private void showAddDialog(int user1, int user2) {
+        Bundle args = new Bundle();
+        args.putInt("user1", user1);
+        args.putInt("user2", user2);
+
+        FragmentManager fragmentManager = getFragmentManager();
+        AddFriendFragment addFriendFragment = new AddFriendFragment();
+        addFriendFragment.show(fragmentManager, "add");
+
+        addFriendFragment.setArguments(args);
+    }
+
+    private ListView.OnItemClickListener friendListOnItemClickListener = new ListView.OnItemClickListener() {
+        @Override
+        public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+            if (bottomNavigationView.getSelectedItemId() == R.id.incomingFriendsItem) {
+                showRespondDialog(userId, getKey(incomingFriends, (String) adapterView.getItemAtPosition(i)));
+                populateListIncoming();
+            } else if (searchViewActivated) {
+                showAddDialog(userId, getKey(searchFriends, (String) adapterView.getItemAtPosition(i)));
+
+            }
+        }
+    };
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -92,12 +141,22 @@ public class FriendListActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    private SearchView.OnCloseListener onCloseListener = new SearchView.OnCloseListener() {
+        @Override
+        public boolean onClose() {
+            System.out.println("SEARCHVIEW CLOSED ");
+            searchViewActivated = false;
+            return false;
+        }
+    };
+
     private SearchView.OnQueryTextListener onQueryTextListener = new SearchView.OnQueryTextListener() {
         @Override
         public boolean onQueryTextSubmit(String query) {
             GetUserByName getUserByName = new GetUserByName(query);
             getUserByName.execute();
             setTitle(R.string.search_friend);
+            searchViewActivated = true;
             return true;
         }
 
@@ -118,7 +177,7 @@ public class FriendListActivity extends AppCompatActivity {
                 populateListFriends();
             } else if (id == R.id.incomingFriendsItem) {
                 populateListIncoming();
-            }else if (id == R.id.outgoingFriendsItem){
+            } else if (id == R.id.outgoingFriendsItem) {
                 populateListOutgoing();
             }
             return true;
@@ -126,7 +185,7 @@ public class FriendListActivity extends AppCompatActivity {
     };
 
     public class GetAllFriendsTask extends AsyncTask<Void, Void, Boolean> {
-         List<String> userNames = new ArrayList<>();
+        List<String> userNames = new ArrayList<>();
 
         @Override
         protected Boolean doInBackground(Void... voids) {
@@ -149,19 +208,17 @@ public class FriendListActivity extends AppCompatActivity {
     }
 
     public class GetIncomingFriends extends AsyncTask<Void, Void, Boolean> {
-        Map<Integer,String> user = new HashMap<>();
-
         @Override
         protected Boolean doInBackground(Void... voids) {
             try {
                 List<Friend> friends = Arrays.asList(client.getInboundOutboundRequests(userId));
                 Iterator iterator = friends.iterator();
-                while(iterator.hasNext()){
+                while (iterator.hasNext()) {
                     Friend friend = (Friend) iterator.next();
-                    if (friend.getUserActionId() != userId && friend.getUser1().getId() != userId){
-                        user.put(friend.getUser1().getId(),friend.getUser1().getUserName());
-                    }else if (friend.getUserActionId() != userId && friend.getUser2().getId() != userId){
-                        user.put(friend.getUser2().getId(),friend.getUser2().getUserName());
+                    if (friend.getUserActionId() != userId && friend.getUser1().getId() != userId) {
+                        incomingFriends.put(friend.getUser1().getId(), friend.getUser1().getUserName());
+                    } else if (friend.getUserActionId() != userId && friend.getUser2().getId() != userId) {
+                        incomingFriends.put(friend.getUser2().getId(), friend.getUser2().getUserName());
                     }
                 }
 
@@ -176,26 +233,26 @@ public class FriendListActivity extends AppCompatActivity {
         protected void onPostExecute(final Boolean success) {
             if (success) {
                 final ArrayList<String> userNames = new ArrayList<>();
-                userNames.addAll(user.values());
+                userNames.addAll(incomingFriends.values());
                 arrayAdapter = new ArrayAdapter<>(FriendListActivity.this, R.layout.all_friends_listview_item, userNames);
                 friendListView.setAdapter(arrayAdapter);
             }
         }
     }
+
     public class GetOutgoingFriends extends AsyncTask<Void, Void, Boolean> {
-        Map<Integer,String> user = new HashMap<>();
 
         @Override
         protected Boolean doInBackground(Void... voids) {
             try {
                 List<Friend> friends = Arrays.asList(client.getInboundOutboundRequests(userId));
                 Iterator iterator = friends.iterator();
-                while(iterator.hasNext()){
+                while (iterator.hasNext()) {
                     Friend friend = (Friend) iterator.next();
-                    if (friend.getUserActionId() == userId && friend.getUser1().getId() != userId){
-                        user.put(friend.getUser1().getId(),friend.getUser1().getUserName());
-                    }else if (friend.getUserActionId() == userId && friend.getUser2().getId() != userId){
-                        user.put(friend.getUser2().getId(),friend.getUser2().getUserName());
+                    if (friend.getUserActionId() == userId && friend.getUser1().getId() != userId) {
+                        outgoingFriends.put(friend.getUser1().getId(), friend.getUser1().getUserName());
+                    } else if (friend.getUserActionId() == userId && friend.getUser2().getId() != userId) {
+                        outgoingFriends.put(friend.getUser2().getId(), friend.getUser2().getUserName());
                     }
                 }
 
@@ -210,7 +267,7 @@ public class FriendListActivity extends AppCompatActivity {
         protected void onPostExecute(final Boolean success) {
             if (success) {
                 final ArrayList<String> userNames = new ArrayList<>();
-                userNames.addAll(user.values());
+                userNames.addAll(outgoingFriends.values());
                 arrayAdapter = new ArrayAdapter<>(FriendListActivity.this, R.layout.all_friends_listview_item, userNames);
                 friendListView.setAdapter(arrayAdapter);
             }
@@ -220,6 +277,7 @@ public class FriendListActivity extends AppCompatActivity {
     public class GetUserByName extends AsyncTask<Void, Void, Boolean> {
         String userName;
         User user;
+
         GetUserByName(String userName) {
             this.userName = userName;
         }
@@ -228,6 +286,7 @@ public class FriendListActivity extends AppCompatActivity {
         protected Boolean doInBackground(Void... voids) {
             try {
                 user = client.getUserByUserName(userName);
+                searchFriends.put(user.getId(), user.getUserName());
             } catch (RestClientException e) {
                 //Cannot call toast on thread that has not called looper prepare
 //                Toast error = new Toast(FriendListActivity.this);
@@ -240,10 +299,20 @@ public class FriendListActivity extends AppCompatActivity {
         protected void onPostExecute(final Boolean success) {
             if (success) {
                 final ArrayList<String> userNames = new ArrayList<>();
-                userNames.add(user.getUserName());
+                userNames.addAll(searchFriends.values());
                 arrayAdapter = new ArrayAdapter<>(FriendListActivity.this, R.layout.all_friends_listview_item, userNames);
                 friendListView.setAdapter(arrayAdapter);
             }
         }
     }
+
+    public static <K, V> K getKey(Map<K, V> map, V value) {
+        for (Map.Entry<K, V> entry : map.entrySet()) {
+            if (value.equals(entry.getValue())) {
+                return entry.getKey();
+            }
+        }
+        return null;
+    }
+
 }

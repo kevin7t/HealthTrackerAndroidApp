@@ -120,7 +120,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         mUserNameView.setError(null);
         mPasswordView.setError(null);
 
-        // Check for a valid password, if the user entered one.
+        // Check for a valid password, if the outgoingFriends entered one.
         if (!TextUtils.isEmpty(password) && !isPasswordValid(password)) {
             mPasswordView.setError(getString(R.string.error_invalid_password));
             focusView = mPasswordView;
@@ -132,7 +132,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             focusView.requestFocus();
         } else {
             // Show a progress spinner, and kick off a background task to
-            // perform the user login attempt.
+            // perform the outgoingFriends login attempt.
             showProgress(true);
             mAuthTask = new UserLoginTask(user);
             mAuthTask.execute((Void) null);
