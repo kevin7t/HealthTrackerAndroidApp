@@ -39,6 +39,27 @@ public class UserFeedFragment extends Fragment {
 
     private FloatingActionButton floatingActionButton;
     private SwipeRefreshLayout homeSwipeRefreshLayout;
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+
+        client = MainActivity.client;
+        prefs = MainActivity.prefs;
+
+        view = inflater.inflate(R.layout.fragment_home, container, false);
+        listView = view.findViewById(R.id.fragment_home_list);
+        floatingActionButton = view.findViewById(R.id.fab);
+        homeSwipeRefreshLayout = view.findViewById(R.id.home_swipe_layout);
+
+        listView.setOnScrollListener(listViewListener);
+        floatingActionButton.setOnClickListener(floatingActionButtonListener);
+        homeSwipeRefreshLayout.setOnRefreshListener(swipeRefreshListener);
+
+        refreshUserFeed();
+        return view;
+    }
+
+
 
     /*
      * Listview scrolling actions
@@ -51,6 +72,7 @@ public class UserFeedFragment extends Fragment {
 
         @Override
         public void onScroll(AbsListView absListView, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+            //TODO BROKEN SCROLL UP CAUSES A REFRESH
             if (firstVisibleItem > 0) {
                 floatingActionButton.hide();
                 homeSwipeRefreshLayout.setEnabled(false);
@@ -72,26 +94,6 @@ public class UserFeedFragment extends Fragment {
         }
     };
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-
-        client = MainActivity.client;
-        prefs = MainActivity.prefs;
-
-        view = inflater.inflate(R.layout.fragment_home, container, false);
-        listView = view.findViewById(R.id.fragment_home_list);
-        floatingActionButton = view.findViewById(R.id.fab);
-        homeSwipeRefreshLayout = view.findViewById(R.id.home_swipe_layout);
-
-        listView.setOnScrollListener(listViewListener);
-        floatingActionButton.setOnClickListener(floatingActionButtonListener);
-        homeSwipeRefreshLayout.setOnRefreshListener(swipeRefreshListener);
-
-        refreshUserFeed();
-        return view;
-    }
-
     private void refreshUserFeed() {
         if (prefs.getInt("userId", 0) != 0) {
             userFeedRefreshTask = new UserFeedRefreshTask();
@@ -109,13 +111,6 @@ public class UserFeedFragment extends Fragment {
                     .setAction("Action", null).show();
             Intent newStatusIntent = new Intent(getActivity(), NewStatusActivity.class);
             startActivity(newStatusIntent);
-            /**Create new activity to post a new status
-             * Open new activity
-             * Pass in user id
-             * then call client
-             * subject and workout and stuff
-             * and then execute async task and then exit activity back to this one and refresh
-             */
         }
     };
 

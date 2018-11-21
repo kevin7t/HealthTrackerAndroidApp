@@ -103,7 +103,7 @@ public class RegisterActivity extends AppCompatActivity implements LoaderCallbac
         mUserNameView.setError(null);
         mPasswordView.setError(null);
 
-        // Check for a valid password, if the user entered one.
+        // Check for a valid password, if the outgoingFriends entered one.
         if (!TextUtils.isEmpty(password) && !isPasswordValid(password)) {
             mPasswordView.setError(getString(R.string.error_invalid_password));
             focusView = mPasswordView;
@@ -120,7 +120,7 @@ public class RegisterActivity extends AppCompatActivity implements LoaderCallbac
             focusView.requestFocus();
         } else {
             // Show a progress spinner, and kick off a background task to
-            // perform the user login attempt.
+            // perform the outgoingFriends login attempt.
             showProgress(true);
             mAuthTask = new UserRegistrationTask(user);
             mAuthTask.execute();
@@ -193,7 +193,7 @@ public class RegisterActivity extends AppCompatActivity implements LoaderCallbac
                 user = client.registerUser(user);
             }catch (RestClientException e){
                 Toast error = new Toast(RegisterActivity.this);
-                error.makeText(RegisterActivity.this, e.toString(), Toast.LENGTH_LONG).show();
+                Toast.makeText(RegisterActivity.this, e.toString(), Toast.LENGTH_LONG).show();
             }
             return true;
         }

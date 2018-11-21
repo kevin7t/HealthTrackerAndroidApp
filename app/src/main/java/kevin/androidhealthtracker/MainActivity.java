@@ -47,10 +47,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //this is localhost
         client = new WebClient(new RestTemplate(), "10.0.2.2", 8080);
+//        client = new WebClient(new RestTemplate(), "192.168.0.106", 8080);
+
         prefs = getSharedPreferences("SharedPreferences", MODE_PRIVATE);
         sessionToken = autoLoginPreviousUser();
-        setContentView(R.layout.main);
+        setContentView(R.layout.activity_main);
 
         toolbar = findViewById(R.id.toolbar);
         navigationView = findViewById(R.id.nav_view);
@@ -120,7 +123,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private View.OnClickListener loginOnClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
-            //Todo if user = logged in, enable log out option via pop up ok and cancel
             if (loggedIn) {
                 showAlertDialog();
             } else {
@@ -147,15 +149,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private String autoLoginPreviousUser() {
-        //Get user name from shared preferences
+        //Get outgoingFriends name from shared preferences
         //Get password from shared preferences
-        //Authenticate user from server
+        //Authenticate outgoingFriends from server
         //Return session id
         return null;
     }
 
     /*
-     * After user login success
+     * After outgoingFriends login success
      */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -166,7 +168,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 userId = prefs.getInt("userId", 0);
                 loggedIn = prefs.getBoolean("loggedIn", false);
                 Toast loggedIn = new Toast(this);
-                loggedIn.makeText(this, userName + " " + userId, Toast.LENGTH_LONG).show();
+                Toast.makeText(this, userName + " " + userId, Toast.LENGTH_LONG).show();
                 setUserToTextView();
                 loadMainFragment();
             }
@@ -193,6 +195,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
+        switch (item.getItemId()){
+            case R.id.friendlistMenuItem:
+                Intent friendListActivityIntent = new Intent(MainActivity.this, FriendListActivity.class);
+                startActivity(friendListActivityIntent);
+        }
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }

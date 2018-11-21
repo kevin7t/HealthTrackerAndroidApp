@@ -33,6 +33,9 @@ public class WebClient {
     public User getUser(int id) {
         return restTemplate.getForObject(url + "/users/" + id, User.class);
     }
+    public User getUserByUserName(String userName) {
+        return restTemplate.getForObject(url + "/users/searchuser/" + userName, User.class);
+    }
 
     public User[] getAllUsers() {
         return restTemplate.getForObject(url + "/users", User[].class);
@@ -63,12 +66,12 @@ public class WebClient {
         return restTemplate.getForObject(url + "/users/getoutboundrequests/" + user1Id, Friend[].class);
     }
 
-    public Friend[] getInboundRequests(int user1Id) {
-        return restTemplate.getForObject(url + "/users/getinboundrequests/" + user1Id, Friend[].class);
+    public Friend[] getInboundOutboundRequests(int user1Id) {
+        return restTemplate.getForObject(url + "/users/getinboundoutboundrequests/" + user1Id, Friend[].class);
     }
 
-    public Friend[] getAllFriends(int user1Id) {
-        return restTemplate.getForObject(url + "/users/getallrelations/" + user1Id, Friend[].class);
+    public User[] getAllFriends(int user1Id) {
+        return restTemplate.getForObject(url + "/users/getallrelations/" + user1Id, User[].class);
     }
 
     public Friend getFriend(int user1Id, int user2Id) {

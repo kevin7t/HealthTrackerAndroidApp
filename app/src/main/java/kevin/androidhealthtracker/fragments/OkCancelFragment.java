@@ -26,7 +26,7 @@ public class OkCancelFragment extends DialogFragment {
                 editor.remove("userName");
                 editor.putBoolean("loggedIn", false);
                 editor.apply();
-                //Todo, exit to main and refresh main activity
+                //Todo, exit to activity_main and refresh activity_main activity
             }
         });
         builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
