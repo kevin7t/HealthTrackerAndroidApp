@@ -28,7 +28,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import kevin.androidhealthtracker.fragments.AddFriendFragment;
 import kevin.androidhealthtracker.fragments.RespondFriendFragment;
@@ -186,11 +185,12 @@ public class FriendListActivity extends AppCompatActivity {
 
     public class GetAllFriendsTask extends AsyncTask<Void, Void, Boolean> {
         List<String> userNames = new ArrayList<>();
-
+        List<User> users = new ArrayList<>();
         @Override
         protected Boolean doInBackground(Void... voids) {
             try {
-                userNames = Arrays.asList(client.getAllFriends(userId)).stream().map(user -> user.getUserName()).collect(Collectors.toList());
+//                userNames = Arrays.asList(client.getAllFriends(userId)).stream().map(user -> user.getUserName()).collect(Collectors.toList());
+                users = Arrays.asList(client.getAllFriends(userId));
             } catch (RestClientException e) {
                 Toast error = new Toast(FriendListActivity.this);
                 Toast.makeText(FriendListActivity.this, e.toString(), Toast.LENGTH_LONG).show();
@@ -202,6 +202,8 @@ public class FriendListActivity extends AppCompatActivity {
         protected void onPostExecute(final Boolean success) {
             if (success) {
                 arrayAdapter = new ArrayAdapter<>(FriendListActivity.this, R.layout.all_friends_listview_item, userNames);
+//                FriendsListAdapter friendsListAdapter = new FriendsListAdapter( ,users);
+                //TODO Fix this, find a way to user activity context for friends list adapter
                 friendListView.setAdapter(arrayAdapter);
             }
         }
