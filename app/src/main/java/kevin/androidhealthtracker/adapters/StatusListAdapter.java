@@ -36,8 +36,10 @@ public class StatusListAdapter extends ArrayAdapter<StatusDTO> {
         ImageView profilePicture = convertView.findViewById(R.id.userProfilePicture);
         TextView userNameTextView = convertView.findViewById(R.id.userNameTextView);
         TextView statusTextView = convertView.findViewById(R.id.statusContentTextView);
+        TextView dateTimeTextView = convertView.findViewById(R.id.statusDateTimeView);
 
         userNameTextView.setText("User id: " + statusDTOList.get(position).getUserId());
+        dateTimeTextView.setText(statusDTOList.get(position).getCreatedAt().toString());
         statusTextView.setText(statusDTOList.get(position).getContent());
         return convertView;
     }
