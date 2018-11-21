@@ -20,6 +20,7 @@ import org.springframework.web.client.ResourceAccessException;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import kevin.androidhealthtracker.MainActivity;
@@ -130,7 +131,7 @@ public class UserFeedFragment extends Fragment {
         protected void onPostExecute(Boolean aBoolean) {
             super.onPostExecute(aBoolean);
             try {
-                Collections.reverse(statusList);
+                Collections.sort(statusList, Comparator.comparing(StatusDTO::getCreatedAt).reversed());
                 StatusListAdapter customListViewAdapter = new StatusListAdapter(getActivity(), statusList);
                 listView.setAdapter(customListViewAdapter);
             } catch (NullPointerException e) {

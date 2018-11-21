@@ -62,10 +62,6 @@ public class WebClient {
         restTemplate.delete(String.format("%s/users/deletefriend/%s/%s", url, user1Id, user2Id), null, Friend.class);
     }
 
-    public Friend[] getOutboundRequests(int user1Id) {
-        return restTemplate.getForObject(url + "/users/getoutboundrequests/" + user1Id, Friend[].class);
-    }
-
     public Friend[] getInboundOutboundRequests(int user1Id) {
         return restTemplate.getForObject(url + "/users/getinboundoutboundrequests/" + user1Id, Friend[].class);
     }
