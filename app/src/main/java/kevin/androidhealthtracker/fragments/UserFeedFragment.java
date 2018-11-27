@@ -73,7 +73,6 @@ public class UserFeedFragment extends Fragment {
 
         @Override
         public void onScroll(AbsListView absListView, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-            //TODO BROKEN SCROLL UP CAUSES A REFRESH
             if (firstVisibleItem > 0) {
                 floatingActionButton.hide();
                 homeSwipeRefreshLayout.setEnabled(false);
@@ -108,8 +107,8 @@ public class UserFeedFragment extends Fragment {
     private View.OnClickListener floatingActionButtonListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
-            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                    .setAction("Action", null).show();
+//            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+//                    .setAction("Action", null).show();
             Intent newStatusIntent = new Intent(getActivity(), NewStatusActivity.class);
             startActivity(newStatusIntent);
         }
@@ -119,7 +118,6 @@ public class UserFeedFragment extends Fragment {
         @Override
         protected Boolean doInBackground(Void... voids) {
             try {
-                //TODO Must sort by date time because status does not show in proper order
                 statusList = Arrays.asList(client.getStatusFromFriendsForUser(prefs.getInt("userId", 0), 1));
             } catch (ResourceAccessException e) {
                 e.printStackTrace();

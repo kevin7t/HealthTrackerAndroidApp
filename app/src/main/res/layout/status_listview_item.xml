@@ -29,8 +29,8 @@
 
     <TextView
         android:id="@+id/statusContentTextView"
-        android:layout_width="284dp"
-        android:layout_height="53dp"
+        android:layout_width="291dp"
+        android:layout_height="30dp"
         android:layout_marginStart="80dp"
         android:layout_marginTop="60dp"
         android:text="Statuscontent"
