@@ -65,7 +65,7 @@ public class NewStatusActivity extends AppCompatActivity {
                 statusType = StatusType.WALK;
                 break;
             case "Run":
-                statusType = StatusType.RUNN;
+                statusType = StatusType.RUN;
                 break;
             case "Sprint":
                 statusType =  StatusType.SPRINT;
