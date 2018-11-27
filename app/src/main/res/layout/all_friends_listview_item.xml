@@ -18,14 +18,14 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/userScoreView"
-        android:layout_width="283dp"
-        android:layout_height="17dp"
-        android:layout_marginStart="12dp"
+        android:id="@+id/userScoreTextView"
+        android:layout_width="216dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
-        android:text="2018-12-24:17:00"
+        android:text="Score"
         android:textColor="@color/colorSecondaryText"
-        app:layout_constraintStart_toEndOf="@+id/userNameTextView"
+        app:layout_constraintStart_toEndOf="@+id/userNameFriendTextView"
         app:layout_constraintTop_toTopOf="parent" />
 
 </android.support.constraint.ConstraintLayout>
