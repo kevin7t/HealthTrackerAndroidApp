@@ -1,17 +1,6 @@
 package kevin.androidhealthtracker.fragments;
 
-import android.app.Fragment;
-import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.AsyncTask;
-import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.v4.widget.SwipeRefreshLayout;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.AbsListView;
-import android.widget.ListView;
 
 import com.kevin.healthtracker.datamodels.dto.StatusDTO;
 
@@ -20,12 +9,7 @@ import org.springframework.web.client.ResourceAccessException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.List;
 
-import kevin.androidhealthtracker.MainActivity;
-import kevin.androidhealthtracker.NewStatusActivity;
-import kevin.androidhealthtracker.R;
-import kevin.androidhealthtracker.WebClient;
 import kevin.androidhealthtracker.adapters.StatusListAdapter;
 
 public class ProfileFeedFragment extends UserFeedFragment {
@@ -33,12 +17,12 @@ public class ProfileFeedFragment extends UserFeedFragment {
 
 
     @Override
- protected void refreshUserFeed(){
-    if (prefs.getInt("userId", 0) != 0) {
-        userFeedRefreshTask = new ProfileFeedRefreshTask();
-        userFeedRefreshTask.execute();
+    protected void refreshUserFeed() {
+        if (prefs.getInt("userId", 0) != 0) {
+            userFeedRefreshTask = new ProfileFeedRefreshTask();
+            userFeedRefreshTask.execute();
+        }
     }
-}
 
     private class ProfileFeedRefreshTask extends AsyncTask<Void, Void, Boolean> {
         @Override
