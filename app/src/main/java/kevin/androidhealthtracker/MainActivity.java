@@ -23,7 +23,8 @@ import org.springframework.web.client.RestTemplate;
 
 import kevin.androidhealthtracker.fragments.FragmentThree;
 import kevin.androidhealthtracker.fragments.FragmentTwo;
-import kevin.androidhealthtracker.fragments.OkCancelFragment;
+import kevin.androidhealthtracker.fragments.LogoutFragment;
+import kevin.androidhealthtracker.fragments.ProfileFeedFragment;
 import kevin.androidhealthtracker.fragments.UserFeedFragment;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
@@ -88,6 +89,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             int id = item.getItemId();
             Class fragmentClass = null;
             if (id == R.id.fragment_home) {
+                setTitle(R.string.title_activity_activity_feed);
                 fragmentClass = UserFeedFragment.class;
                 //Todo: From fragment home/news feed once you go into replies that will replace this fragment, therefore must
                 //add the old fragment to backstack
@@ -111,10 +113,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     /*
      * Show alert dialog
      */
-    private void showAlertDialog() {
+    private void showLogoutDialog() {
         FragmentManager fragmentManager = getFragmentManager();
-        OkCancelFragment okCancelFragment = new OkCancelFragment();
-        okCancelFragment.show(fragmentManager, "OkCancel");
+        LogoutFragment logoutFragment = new LogoutFragment();
+        logoutFragment.show(fragmentManager, "Logout");
     }
 
     /*
@@ -124,7 +126,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         @Override
         public void onClick(View view) {
             if (loggedIn) {
-                showAlertDialog();
+                showLogoutDialog();
             } else {
                 Intent login = new Intent(MainActivity.this, LoginActivity.class);
                 startActivityForResult(login, LOGIN_REQUEST_CODE);
@@ -136,6 +138,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         transaction = getFragmentManager().beginTransaction();
         try {
             transaction.replace(R.id.fragment_container, UserFeedFragment.class.newInstance()).commit();
+            setTitle(R.string.title_activity_activity_feed);
+        } catch (InstantiationException | IllegalAccessException | NullPointerException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void loadProfileFragment() {
+        transaction = getFragmentManager().beginTransaction();
+        try {
+            transaction.replace(R.id.fragment_container, ProfileFeedFragment.class.newInstance()).commit();
+            setTitle(R.string.title_activity_profile);
         } catch (InstantiationException | IllegalAccessException | NullPointerException e) {
             e.printStackTrace();
         }
@@ -199,6 +212,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             case R.id.friendlistMenuItem:
                 Intent friendListActivityIntent = new Intent(MainActivity.this, FriendListActivity.class);
                 startActivity(friendListActivityIntent);
+                break;
+            case R.id.profileMenuItem:
+                loadProfileFragment();
+                break;
         }
         drawer.closeDrawer(GravityCompat.START);
         return true;
