@@ -22,19 +22,22 @@ public class User {
     public Integer getLowCalories(){
         //Sedentary or light activity
         Double calculation = getBmr()*1.53;
-        return calculation.intValue();
+        maintenence = calculation.intValue();
+        return maintenence;
     }
 
     public Integer getMediumCalories(){
         //Active or moderately active
         Double calculation = getBmr()*1.76;
-        return calculation.intValue();
+        maintenence = calculation.intValue();
+        return maintenence;
     }
 
     public Integer getHighCalories(){
         //Highly active
         Double calculation = getBmr()*2.25;
-        return calculation.intValue();
+        maintenence = calculation.intValue();
+        return maintenence;
     }
 }
 
