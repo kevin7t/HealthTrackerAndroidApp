@@ -1,96 +1,110 @@
 package kevin.androidhealthtracker.fragments;
 
+import android.app.Fragment;
 import android.content.Context;
-import android.net.Uri;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
+import android.support.design.widget.FloatingActionButton;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
+import kevin.androidhealthtracker.InputUserHealthDataActivity;
+import kevin.androidhealthtracker.MainActivity;
 import kevin.androidhealthtracker.R;
 
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link UserProgressFragment.OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link UserProgressFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
+import static android.app.Activity.RESULT_OK;
+
 public class UserProgressFragment extends Fragment {
-    private OnFragmentInteractionListener mListener;
+    private String USER_SETUP_STATUS = "user_setup_status";
+    private Boolean USER_SETUP_STATUS_BOOLEAN;
+    private static final int USER_DATA_REQUEST_CODE = 7;
 
-    public UserProgressFragment() {
-        // Required empty public constructor
-    }
+    private View view;
+    private ProgressBar calorieProgressBar;
+    private FloatingActionButton floatingActionButton;
+    private SharedPreferences prefs;
+    private SharedPreferences.Editor editor;
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment UserProgressFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        public static UserProgressFragment newInstance(String param1, String param2) {
-            UserProgressFragment fragment = new UserProgressFragment();
-        Bundle args = new Bundle();
-        fragment.setArguments(args);
-        return fragment;
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-        }
-    }
+    private TextView goalCaloriesTextView, consumedCaloriesTextView, burntCaloriesTextView, netCaloriesTextView;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_progressfragment, container, false);
-    }
+        view = inflater.inflate(R.layout.fragment_progressfragment, container, false);
+        calorieProgressBar = view.findViewById(R.id.CalorieProgressBar);
+        goalCaloriesTextView = view.findViewById(R.id.CalorieGoalValue);
+        consumedCaloriesTextView = view.findViewById(R.id.ConsumedCalorieValue);
+        burntCaloriesTextView = view.findViewById(R.id.BurntCaloriesValue);
+        netCaloriesTextView = view.findViewById(R.id.NetCalorieValue);
+        prefs = MainActivity.prefs;
+        editor = this.getActivity().getSharedPreferences("SharedPreferences", Context.MODE_PRIVATE).edit();
+        floatingActionButton = view.findViewById(R.id.fab);
+        floatingActionButton.setOnClickListener(floatingActionButtonListener);
 
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
+
+        try {
+            USER_SETUP_STATUS_BOOLEAN = prefs.getBoolean(USER_SETUP_STATUS, false);
+        } catch (NullPointerException e) {
+            e.printStackTrace();
         }
-    }
+        //TODO: Room integration, store weight as a table, and the user profile as its own thing
+        //First store user details, then store the weight with a date for the graph
+        //TODO Usersetup does not work correctly, the progress bar does not update
 
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        if (context instanceof OnFragmentInteractionListener) {
-            mListener = (OnFragmentInteractionListener) context;
+        if (USER_SETUP_STATUS_BOOLEAN == false) {
+            //Show user profile setup fragment
+            Intent userSetupIntent = new Intent(getActivity(), InputUserHealthDataActivity.class);
+            startActivityForResult(userSetupIntent, USER_DATA_REQUEST_CODE);
         } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
+            try {
+                calorieProgressBar.setProgress(0);
+                goalCaloriesTextView.setText(prefs.getInt("lowcalories", 0));
+                consumedCaloriesTextView.setText(0);
+                burntCaloriesTextView.setText(0);
+                netCaloriesTextView.setText(0);
+            } catch (Resources.NotFoundException e) {
+                e.printStackTrace();
+            }
+
+        }
+
+
+        return view;
+    }
+
+    private View.OnClickListener floatingActionButtonListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            Intent userSetupIntent = new Intent(getActivity(), InputUserHealthDataActivity.class);
+            startActivityForResult(userSetupIntent, USER_DATA_REQUEST_CODE);
+        }
+    };
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == USER_DATA_REQUEST_CODE) {
+            if (resultCode == RESULT_OK) {
+                try {
+                    USER_SETUP_STATUS_BOOLEAN = prefs.getBoolean(USER_SETUP_STATUS,false);
+                    calorieProgressBar.setProgress(0);
+                    goalCaloriesTextView.setText(prefs.getInt("lowcalories", 0));
+                    consumedCaloriesTextView.setText(0);
+                    burntCaloriesTextView.setText(0);
+                    netCaloriesTextView.setText(0);
+                } catch (Resources.NotFoundException e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        mListener = null;
-    }
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
-    public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        void onFragmentInteraction(Uri uri);
-    }
 }
+

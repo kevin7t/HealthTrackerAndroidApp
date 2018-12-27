@@ -33,6 +33,7 @@ public class NewStatusActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_status);
         Toolbar toolbar = findViewById(R.id.toolbar);
+        toolbar.setTitle("Create New Status");
         setSupportActionBar(toolbar);
         client = MainActivity.client;
         prefs = getSharedPreferences("SharedPreferences", MODE_PRIVATE);

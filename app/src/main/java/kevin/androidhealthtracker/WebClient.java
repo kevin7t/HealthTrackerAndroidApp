@@ -45,7 +45,6 @@ public class WebClient {
         restTemplate.delete(url + "/users/" + id);
     }
 
-    //Todo null object as request?
     public Friend addFriend(int user1Id, int user2Id) {
         return restTemplate.postForObject(String.format("%s/users/addfriend/%s/%s", url, user1Id, user2Id), null, Friend.class);
     }
@@ -75,7 +74,7 @@ public class WebClient {
     }
 
     /**
-     * User feed functions
+     * UserCalorieProfile feed functions
      */
 
     public StatusDTO createStatus(StatusDTO statusDTO) {

@@ -1,14 +1,17 @@
 package kevin.androidhealthtracker.datamodels;
 
+import android.arch.persistence.room.Entity;
+
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
-public class User {
-    private Gender gender;
-    private Double weight;
-    private Double height;
+@Entity
+public class UserCalorieProfile {
+    private String gender;
+    private Float weight;
+    private Float height;
     private int age;
     private Integer bmr;
     private Integer maintenence;

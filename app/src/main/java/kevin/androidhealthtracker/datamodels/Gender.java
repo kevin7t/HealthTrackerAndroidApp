@@ -1,5 +1,6 @@
 package kevin.androidhealthtracker.datamodels;
 
-public enum Gender {
-    Male,Female
+public class Gender {
+    public static String Male="M";
+    public static String Female= "F";
 }

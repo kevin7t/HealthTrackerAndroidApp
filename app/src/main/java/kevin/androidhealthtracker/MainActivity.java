@@ -21,10 +21,10 @@ import android.widget.Toast;
 
 import org.springframework.web.client.RestTemplate;
 
-import kevin.androidhealthtracker.fragments.FragmentThree;
 import kevin.androidhealthtracker.fragments.FragmentTwo;
 import kevin.androidhealthtracker.fragments.OkCancelFragment;
 import kevin.androidhealthtracker.fragments.UserFeedFragment;
+import kevin.androidhealthtracker.fragments.UserProgressFragment;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
     public static SharedPreferences prefs;
@@ -66,6 +66,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         navigationView.setNavigationItemSelectedListener(this);
         bottomNavigationView.setOnNavigationItemSelectedListener(navigationItemSelectedListener);
         headerView.setOnClickListener(loginOnClickListener);
+        toolbar.setTitle("Home Feed");
 
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -89,12 +90,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             Class fragmentClass = null;
             if (id == R.id.fragment_home) {
                 fragmentClass = UserFeedFragment.class;
-                //Todo: From fragment home/news feed once you go into replies that will replace this fragment, therefore must
-                //add the old fragment to backstack
+                toolbar.setTitle("Home Feed");
             } else if (id == R.id.fragment2) {
                 fragmentClass = FragmentTwo.class;
-            } else if (id == R.id.fragment3) {
-                fragmentClass = FragmentThree.class;
+            } else if (id == R.id.fragment_progress) {
+                fragmentClass = UserProgressFragment.class;
+                toolbar.setTitle("Progress");
             }
 
             try {
