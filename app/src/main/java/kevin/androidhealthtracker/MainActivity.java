@@ -3,6 +3,7 @@ package kevin.androidhealthtracker;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -196,10 +197,18 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
-        switch (item.getItemId()){
+        switch (item.getItemId()) {
             case R.id.friendlistMenuItem:
                 Intent friendListActivityIntent = new Intent(MainActivity.this, FriendListActivity.class);
                 startActivity(friendListActivityIntent);
+                break;
+
+            case R.id.clearLocalProfileMenuItem:
+                SharedPreferences.Editor editor = getSharedPreferences("SharedPreferences", Context.MODE_PRIVATE).edit();
+
+                editor.putBoolean("user_setup_status", false);
+                editor.apply();
+                break;
         }
         drawer.closeDrawer(GravityCompat.START);
         return true;

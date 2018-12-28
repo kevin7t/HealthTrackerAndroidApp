@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/colorGrey"
     tools:context=".InputUserHealthDataActivity">
 
     <android.support.design.widget.AppBarLayout
@@ -21,137 +22,144 @@
     </android.support.design.widget.AppBarLayout>
 
     <android.support.constraint.ConstraintLayout
+        android:paddingTop="5dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <LinearLayout
+        <android.support.v7.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-
-            android:orientation="vertical">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="16dp"
-                android:orientation="horizontal"
-                android:weightSum="6">
-
-                <TextView
-                    android:id="@+id/GenderTextView"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="5"
-                    android:text="Gender"
-                    android:textColor="@color/colorPrimaryText"
-                    android:textSize="18dp" />
-
-                <TextView
-                    android:id="@+id/maletext"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="M"
-                    android:textColor="@color/colorPrimaryText"
-                    android:textSize="18dp" />
-
-                <Switch
-                    android:id="@+id/genderSwitchItem"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
-
-                <TextView
-                    android:id="@+id/femaletext"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="F"
-                    android:textColor="@color/colorPrimaryText"
-                    android:textSize="18dp" />
-
-            </LinearLayout>
+            android:paddingTop="20dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="8dp"
-                android:orientation="horizontal">
 
-                <TextView
-                    android:id="@+id/AgeTextView"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="16dp"
+                    android:orientation="horizontal"
+                    android:weightSum="6">
+
+                    <TextView
+                        android:id="@+id/GenderTextView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="5"
+                        android:text="Gender"
+                        android:textColor="@color/colorPrimaryText"
+                        android:textSize="18dp" />
+
+                    <TextView
+                        android:id="@+id/maletext"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="M"
+                        android:textColor="@color/colorPrimaryText"
+                        android:textSize="18dp" />
+
+                    <Switch
+                        android:id="@+id/genderSwitchItem"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                    <TextView
+                        android:id="@+id/femaletext"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="F"
+                        android:textColor="@color/colorPrimaryText"
+                        android:textSize="18dp" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="8dp"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/AgeTextView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Age"
+                        android:textColor="@color/colorPrimaryText"
+                        android:textSize="18dp" />
+
+                    <EditText
+                        android:id="@+id/AgeEditText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="230dp"
+                        android:inputType="number"
+                        android:paddingHorizontal="30dp"
+                        android:textColor="@color/colorPrimaryText" />
+
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="8dp"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/WeightTextView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Weight"
+                        android:textColor="@color/colorPrimaryText"
+                        android:textSize="18dp" />
+
+                    <EditText
+                        android:id="@+id/WeightEditText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="205dp"
+                        android:hint="KG"
+                        android:inputType="number|numberDecimal"
+                        android:paddingHorizontal="30dp"
+                        android:textColor="@color/colorPrimaryText" />
+                </LinearLayout>
+
+                <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Age"
-                    android:textColor="@color/colorPrimaryText"
-                    android:textSize="18dp" />
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="8dp"
+                    android:orientation="horizontal">
 
-                <EditText
-                    android:id="@+id/AgeEditText"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="230dp"
-                    android:inputType="number"
-                    android:textColor="@color/colorPrimaryText"
-                    android:paddingHorizontal="30dp" />
+                    <TextView
+                        android:id="@+id/HeightTextView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Height"
+                        android:textColor="@color/colorPrimaryText"
+                        android:textSize="18dp" />
+
+                    <EditText
+                        android:id="@+id/HeightEditText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="207dp"
+                        android:hint="CM"
+                        android:inputType="number|numberDecimal"
+                        android:paddingHorizontal="30dp"
+                        android:textColor="@color/colorPrimaryText" />
+                </LinearLayout>
 
 
             </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="8dp"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:id="@+id/WeightTextView"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Weight"
-                    android:textColor="@color/colorPrimaryText"
-                    android:textSize="18dp" />
-
-                <EditText
-                    android:id="@+id/WeightEditText"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="205dp"
-                    android:hint="KG"
-                    android:textColor="@color/colorPrimaryText"
-                    android:inputType="number|numberDecimal"
-                    android:paddingHorizontal="30dp" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="8dp"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:id="@+id/HeightTextView"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Height"
-                    android:textColor="@color/colorPrimaryText"
-                    android:textSize="18dp" />
-
-                <EditText
-                    android:id="@+id/HeightEditText"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="207dp"
-                    android:hint="CM"
-                    android:textColor="@color/colorPrimaryText"
-                    android:inputType="number|numberDecimal"
-                    android:paddingHorizontal="30dp" />
-            </LinearLayout>
-
-
-        </LinearLayout>
+        </android.support.v7.widget.CardView>
     </android.support.constraint.ConstraintLayout>
 
 

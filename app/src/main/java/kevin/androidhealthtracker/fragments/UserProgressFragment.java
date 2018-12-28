@@ -10,6 +10,8 @@ import android.support.design.widget.FloatingActionButton;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -29,6 +31,8 @@ public class UserProgressFragment extends Fragment {
     private FloatingActionButton floatingActionButton;
     private SharedPreferences prefs;
     private SharedPreferences.Editor editor;
+    private Button increaseConsumedCalories, decreaseConsumedCalories, increaseExerciseCalories, decreaseExerciseCalories;
+    private EditText consumedCaloriesEditText, exerciseCaloriesEditText;
 
     private TextView goalCaloriesTextView, consumedCaloriesTextView, burntCaloriesTextView, netCaloriesTextView;
 
@@ -42,6 +46,17 @@ public class UserProgressFragment extends Fragment {
         consumedCaloriesTextView = view.findViewById(R.id.ConsumedCalorieValue);
         burntCaloriesTextView = view.findViewById(R.id.BurntCaloriesValue);
         netCaloriesTextView = view.findViewById(R.id.NetCalorieValue);
+
+        consumedCaloriesEditText = view.findViewById(R.id.calorieIntakeEditText);
+        exerciseCaloriesEditText = view.findViewById(R.id.exerciseCaloriesEditText);
+
+        increaseConsumedCalories = view.findViewById(R.id.increaseConsumedCaloriesButton);
+        decreaseConsumedCalories = view.findViewById(R.id.decreaseConsumedCaloriesButton);
+        increaseExerciseCalories = view.findViewById(R.id.increaseExerciseCaloriesButton);
+        decreaseExerciseCalories = view.findViewById(R.id.decreaseExerciseCaloriesButton);
+
+        //TODO Create click listeners for the buttons to change edit text and then save to shared prefs every time
+
         prefs = MainActivity.prefs;
         editor = this.getActivity().getSharedPreferences("SharedPreferences", Context.MODE_PRIVATE).edit();
         floatingActionButton = view.findViewById(R.id.fab);
@@ -63,6 +78,7 @@ public class UserProgressFragment extends Fragment {
             startActivityForResult(userSetupIntent, USER_DATA_REQUEST_CODE);
         } else {
             try {
+                //TODO Get these values from shared preferences
                 calorieProgressBar.setProgress(0);
                 goalCaloriesTextView.setText(prefs.getInt("lowcalories", 0));
                 consumedCaloriesTextView.setText(0);

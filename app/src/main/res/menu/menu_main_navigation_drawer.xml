@@ -9,5 +9,10 @@
             android:checked="false"
             android:icon="@drawable/ic_friends_24dp"
             android:title="@string/title_activity_friendlist" />
+        <item
+            android:id="@+id/clearLocalProfileMenuItem"
+            android:checked="false"
+            android:icon="@drawable/ic_friends_24dp"
+            android:title="Delete local profile" />
     </group>
 </menu>
