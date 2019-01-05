@@ -31,8 +31,9 @@ public class UserProgressFragment extends Fragment {
     private FloatingActionButton floatingActionButton;
     private SharedPreferences prefs;
     private SharedPreferences.Editor editor;
-    private Button increaseConsumedCalories, decreaseConsumedCalories, increaseExerciseCalories, decreaseExerciseCalories;
-    private EditText consumedCaloriesEditText, exerciseCaloriesEditText;
+    private Button increaseConsumedCalories, decreaseConsumedCalories, increaseBurntCalories, decreaseBurntCalories;
+    private EditText consumedCaloriesEditText, burntCaloriesEditText;
+    private Integer calories, consumedCalories, burntCalories, netCalories, progress;
 
     private TextView goalCaloriesTextView, consumedCaloriesTextView, burntCaloriesTextView, netCaloriesTextView;
 
@@ -48,14 +49,18 @@ public class UserProgressFragment extends Fragment {
         netCaloriesTextView = view.findViewById(R.id.NetCalorieValue);
 
         consumedCaloriesEditText = view.findViewById(R.id.calorieIntakeEditText);
-        exerciseCaloriesEditText = view.findViewById(R.id.exerciseCaloriesEditText);
+        burntCaloriesEditText = view.findViewById(R.id.burntCaloriesEditText);
 
         increaseConsumedCalories = view.findViewById(R.id.increaseConsumedCaloriesButton);
         decreaseConsumedCalories = view.findViewById(R.id.decreaseConsumedCaloriesButton);
-        increaseExerciseCalories = view.findViewById(R.id.increaseExerciseCaloriesButton);
-        decreaseExerciseCalories = view.findViewById(R.id.decreaseExerciseCaloriesButton);
+        increaseBurntCalories = view.findViewById(R.id.increaseBurntCaloriesButton);
+        decreaseBurntCalories = view.findViewById(R.id.decreaseBurntCaloriesButton);
 
-        //TODO Create click listeners for the buttons to change edit text and then save to shared prefs every time
+        increaseConsumedCalories.setOnClickListener(increaseCaloriesConsumedListener);
+        decreaseConsumedCalories.setOnClickListener(decreaseCaloriesConsumedListener);
+        increaseBurntCalories.setOnClickListener(increaseBurntCaloriesListener);
+        decreaseBurntCalories.setOnClickListener(decreaseBurntCaloriesListener);
+
 
         prefs = MainActivity.prefs;
         editor = this.getActivity().getSharedPreferences("SharedPreferences", Context.MODE_PRIVATE).edit();
@@ -69,8 +74,8 @@ public class UserProgressFragment extends Fragment {
             e.printStackTrace();
         }
         //TODO: Room integration, store weight as a table, and the user profile as its own thing
+        //TODO: Reset calorie tracking per day, use prefs to store string of date and match to current date on activity launch
         //First store user details, then store the weight with a date for the graph
-        //TODO Usersetup does not work correctly, the progress bar does not update
 
         if (USER_SETUP_STATUS_BOOLEAN == false) {
             //Show user profile setup fragment
@@ -78,12 +83,7 @@ public class UserProgressFragment extends Fragment {
             startActivityForResult(userSetupIntent, USER_DATA_REQUEST_CODE);
         } else {
             try {
-                //TODO Get these values from shared preferences
-                calorieProgressBar.setProgress(0);
-                goalCaloriesTextView.setText(prefs.getInt("lowcalories", 0));
-                consumedCaloriesTextView.setText(0);
-                burntCaloriesTextView.setText(0);
-                netCaloriesTextView.setText(0);
+                refreshProgress();
             } catch (Resources.NotFoundException e) {
                 e.printStackTrace();
             }
@@ -94,12 +94,70 @@ public class UserProgressFragment extends Fragment {
         return view;
     }
 
-    private View.OnClickListener floatingActionButtonListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View view) {
-            Intent userSetupIntent = new Intent(getActivity(), InputUserHealthDataActivity.class);
-            startActivityForResult(userSetupIntent, USER_DATA_REQUEST_CODE);
+    private void saveConsumedCalories(Integer consumedCalories) {
+        SharedPreferences.Editor editor = getActivity().getSharedPreferences("SharedPreferences", Context.MODE_PRIVATE).edit();
+        editor.putInt("consumedcalories", consumedCalories);
+        editor.apply();
+    }
+
+    private void saveBurntCalories(Integer burntCalories) {
+        SharedPreferences.Editor editor = getActivity().getSharedPreferences("SharedPreferences", Context.MODE_PRIVATE).edit();
+        editor.putInt("burntcalories", burntCalories);
+        editor.apply();
+    }
+
+    private void refreshProgress() {
+        calories = prefs.getInt("lowcalories", 0);
+        consumedCalories = prefs.getInt("consumedcalories", 0);
+        burntCalories = prefs.getInt("burntcalories", 0);
+        netCalories = consumedCalories - burntCalories;
+        double percentage = (double) netCalories / (double) calories * 100;
+        progress = (int) Math.round(percentage);
+
+        calorieProgressBar.setProgress(progress);
+        goalCaloriesTextView.setText(calories.toString());
+        consumedCaloriesTextView.setText(consumedCalories.toString());
+        consumedCaloriesEditText.setText(consumedCalories.toString());
+        burntCaloriesTextView.setText(burntCalories.toString());
+        burntCaloriesEditText.setText(burntCalories.toString());
+        netCaloriesTextView.setText(netCalories.toString());
+    }
+
+    private View.OnClickListener floatingActionButtonListener = view -> {
+        Intent userSetupIntent = new Intent(getActivity(), InputUserHealthDataActivity.class);
+        startActivityForResult(userSetupIntent, USER_DATA_REQUEST_CODE);
+    };
+
+    private View.OnClickListener increaseCaloriesConsumedListener = view -> {
+        consumedCalories += 100;
+        consumedCaloriesEditText.setText(consumedCalories.toString());
+        saveConsumedCalories(consumedCalories);
+        refreshProgress();
+    };
+
+    private View.OnClickListener decreaseCaloriesConsumedListener = view -> {
+        if (consumedCalories - 100 >= 0) {
+            consumedCalories -= 100;
         }
+        consumedCaloriesEditText.setText(consumedCalories.toString());
+        saveConsumedCalories(consumedCalories);
+        refreshProgress();
+    };
+
+    private View.OnClickListener increaseBurntCaloriesListener = view -> {
+        burntCalories += 100;
+        burntCaloriesEditText.setText(burntCalories.toString());
+        saveBurntCalories(burntCalories);
+        refreshProgress();
+    };
+
+    private View.OnClickListener decreaseBurntCaloriesListener = view -> {
+        if (burntCalories - 100 >= 0) {
+            burntCalories -= 100;
+        }
+        burntCaloriesEditText.setText(burntCalories.toString());
+        saveBurntCalories(burntCalories);
+        refreshProgress();
     };
 
     @Override
@@ -108,12 +166,8 @@ public class UserProgressFragment extends Fragment {
         if (requestCode == USER_DATA_REQUEST_CODE) {
             if (resultCode == RESULT_OK) {
                 try {
-                    USER_SETUP_STATUS_BOOLEAN = prefs.getBoolean(USER_SETUP_STATUS,false);
-                    calorieProgressBar.setProgress(0);
-                    goalCaloriesTextView.setText(prefs.getInt("lowcalories", 0));
-                    consumedCaloriesTextView.setText(0);
-                    burntCaloriesTextView.setText(0);
-                    netCaloriesTextView.setText(0);
+                    USER_SETUP_STATUS_BOOLEAN = prefs.getBoolean(USER_SETUP_STATUS, false);
+                    refreshProgress();
                 } catch (Resources.NotFoundException e) {
                     e.printStackTrace();
                 }

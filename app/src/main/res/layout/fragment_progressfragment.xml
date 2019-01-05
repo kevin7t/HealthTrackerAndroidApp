@@ -67,7 +67,7 @@
                             android:id="@+id/CalorieGoalValue"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="2000 "
+                            android:text="2000"
                             android:textColor="@color/colorAccent" />
                     </LinearLayout>
 
@@ -214,7 +214,7 @@
                     android:layout_weight="1"
                     android:textSize="18sp" />
                 <EditText
-                    android:id="@+id/exerciseCaloriesEditText"
+                    android:id="@+id/burntCaloriesEditText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="000"
@@ -223,14 +223,14 @@
                     android:textSize="18sp" />
 
                 <android.support.v7.widget.AppCompatButton
-                    android:id="@+id/decreaseExerciseCaloriesButton"
+                    android:id="@+id/decreaseBurntCaloriesButton"
                     android:layout_width="2dp"
                     android:layout_height="40dp"
                     android:layout_weight="1"
                     android:text="-"/>
 
                 <android.support.v7.widget.AppCompatButton
-                    android:id="@+id/increaseExerciseCaloriesButton"
+                    android:id="@+id/increaseBurntCaloriesButton"
                     android:layout_width="2dp"
                     android:layout_height="40dp"
                     android:layout_weight="1"

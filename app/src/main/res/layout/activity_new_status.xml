@@ -34,11 +34,10 @@
         tools:showIn="@layout/activity_new_status">
 
         <TextView
-            android:id="@+id/usernameView"
-            android:layout_width="89dp"
+            android:id="@+id/userNameTextView"
+            android:layout_width="wrap_content"
             android:layout_height="22dp"
             android:layout_marginStart="4dp"
-            android:text="@string/prompt_username"
             android:textColor="@android:color/primary_text_light"
             app:layout_constraintStart_toEndOf="@+id/imageView"
             app:layout_constraintTop_toTopOf="parent" />

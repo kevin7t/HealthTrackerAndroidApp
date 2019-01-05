@@ -26,5 +26,4 @@ public class WeightDated {
     @ColumnInfo(name = "weight")
     private Float weight;
 
-    //TODO Add this to a table when updating weight
-}
+ }
