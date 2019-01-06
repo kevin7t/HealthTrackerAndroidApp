@@ -15,7 +15,7 @@ import lombok.NonNull;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity(tableName = "weight_table")
-public class WeightDated {
+public class Weight {
 
     @PrimaryKey
     @NonNull
