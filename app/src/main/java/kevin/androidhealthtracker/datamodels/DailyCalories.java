@@ -18,20 +18,15 @@ import lombok.NonNull;
 @Entity(tableName = "dailycalories_table")
 public class DailyCalories {
     @PrimaryKey
-    @NonNull
     @ColumnInfo(name = "date")
     private Date date;
 
-
-    @NonNull
     @ColumnInfo(name = "goalcalories")
     private int goalCalories;
 
-    @NonNull
     @ColumnInfo(name = "consumedcalories")
     private int consumedCalories;
 
-    @NonNull
     @ColumnInfo(name = "burntcalories")
     private int burntCalories;
 

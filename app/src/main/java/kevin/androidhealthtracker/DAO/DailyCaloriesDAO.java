@@ -16,6 +16,7 @@ public interface DailyCaloriesDAO {
     @Query("SELECT * FROM dailycalories_table")
     List<DailyCalories> getAll();
 
+    //TODO Must use type converter to convert date to a string and back
     @Query("SELECT * FROM dailycalories_table WHERE date = :date")
     DailyCalories getByDate(Date date);
 

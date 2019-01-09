@@ -15,6 +15,7 @@ public interface WeightDAO {
     @Query("SELECT * FROM weight_table")
     List<Weight> getAll();
 
+    //TODO Must use type converter to convert date to a string and back
     @Query("SELECT * FROM weight_table WHERE date = :date")
     Weight getByDate(Date date);
 

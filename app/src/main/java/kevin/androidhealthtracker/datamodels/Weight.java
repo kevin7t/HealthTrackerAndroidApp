@@ -18,11 +18,9 @@ import lombok.NonNull;
 public class Weight {
 
     @PrimaryKey
-    @NonNull
     @ColumnInfo(name = "date")
     private Date date;
 
-    @NonNull
     @ColumnInfo(name = "weight")
     private Float weight;
 
