@@ -1,10 +1,12 @@
 package kevin.androidhealthtracker.fragments;
 
 import android.app.Fragment;
+import android.arch.persistence.room.Room;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
+import android.database.sqlite.SQLiteConstraintException;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.view.LayoutInflater;
@@ -15,14 +17,31 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+
 import kevin.androidhealthtracker.InputUserHealthDataActivity;
 import kevin.androidhealthtracker.MainActivity;
 import kevin.androidhealthtracker.R;
+import kevin.androidhealthtracker.database.HealthTrackerDatabase;
+import kevin.androidhealthtracker.datamodels.DailyCalories;
+import kevin.androidhealthtracker.datamodels.Weight;
 
 import static android.app.Activity.RESULT_OK;
 
 public class UserProgressFragment extends Fragment {
     private String USER_SETUP_STATUS = "user_setup_status";
+    private static final String DATABASE_NAME = "healthtracker_db";
+
+    private HealthTrackerDatabase healthTrackerDatabase;
+
     private Boolean USER_SETUP_STATUS_BOOLEAN;
     private static final int USER_DATA_REQUEST_CODE = 7;
 
@@ -36,6 +55,8 @@ public class UserProgressFragment extends Fragment {
     private Integer calories, consumedCalories, burntCalories, netCalories, progress;
 
     private TextView goalCaloriesTextView, consumedCaloriesTextView, burntCaloriesTextView, netCaloriesTextView;
+    private ExecutorService executor;
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -73,8 +94,10 @@ public class UserProgressFragment extends Fragment {
         } catch (NullPointerException e) {
             e.printStackTrace();
         }
-        //TODO: Room integration, store weight as a table, and the user profile as its own thing
         //TODO: Reset calorie tracking per day, use prefs to store string of date and match to current date on activity launch
+
+
+        //TODO: save weight and calories to database and retrieve them on activity creation
         //First store user details, then store the weight with a date for the graph
 
         if (USER_SETUP_STATUS_BOOLEAN == false) {
@@ -90,7 +113,12 @@ public class UserProgressFragment extends Fragment {
 
         }
 
+        healthTrackerDatabase = Room.databaseBuilder(getActivity().getApplicationContext(),
+                HealthTrackerDatabase.class, DATABASE_NAME).fallbackToDestructiveMigration().build();
 
+        executor = Executors.newWorkStealingPool();
+
+        testDB();
         return view;
     }
 
@@ -175,6 +203,132 @@ public class UserProgressFragment extends Fragment {
         }
     }
 
+    private void testDB() {
+
+        try {
+            System.out.println(getAllWeightFromDB().get());
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+        }
+
+
+        String date = null;
+        try {
+            date = getCurrentDateTImeAsString();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        saveWeightToDB(date, 60.0f);
+        Future<Weight> weightFuture = getWeightFromDB(date);
+        if (weightFuture.isDone()){
+            try {
+                System.out.println(weightFuture.get().toString());
+            } catch (InterruptedException | ExecutionException e) {
+                e.printStackTrace();
+            }
+        }
+        try {
+            System.out.println(getAllWeightFromDB().get());
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+        }
+
+
+    }
+
+    private String getCurrentDateTImeAsString() throws ParseException {
+        SimpleDateFormat formatter = new SimpleDateFormat(
+                "dd/MM/yyyy");
+        return formatter.parse(formatter.format(new Date())).toString();
+    }
+
+    private void saveWeightToDB(String date, float weight) {
+        new Thread(() -> {
+            Weight weightObj = new Weight();
+            weightObj.setDate(date);
+            weightObj.setWeight(weight);
+            try {
+                healthTrackerDatabase.weightDAO().insert(weightObj);
+            }catch (SQLiteConstraintException e){
+                healthTrackerDatabase.weightDAO().update(weightObj);
+            }
+        }).start();
+    }
+
+    private Future<Weight> getWeightFromDB(String date) {
+        Callable<Weight> task = () -> {
+            Weight weight = null;
+            try {
+                weight = healthTrackerDatabase.weightDAO().getByDate(date);
+            } catch (NullPointerException e) {
+                e.printStackTrace();
+            }
+            return weight;
+        };
+
+        Future<Weight> weightFuture = executor.submit(task);
+        return weightFuture;
+    }
+
+    private Future<List<Weight>> getAllWeightFromDB() {
+        Callable<List<Weight>> task = () -> {
+            List<Weight> weightList = null;
+            try {
+                weightList = healthTrackerDatabase.weightDAO().getAll();
+            } catch (NullPointerException e) {
+                e.printStackTrace();
+            }
+            return weightList;
+        };
+
+        Future<List<Weight>> weightFuture = executor.submit(task);
+        return weightFuture;
+    }
+
+    private void saveCaloriestToDB(String date, int goal, int consumed, int burnt) {
+        new Thread(() -> {
+            DailyCalories dailyCalories = new DailyCalories();
+            dailyCalories.setDate(date);
+            dailyCalories.setBurntCalories(burnt);
+            dailyCalories.setConsumedCalories(consumed);
+            dailyCalories.setBurntCalories(burnt);
+            try {
+                healthTrackerDatabase.dailyCaloriesDAO().insert(dailyCalories);
+            }catch (SQLiteConstraintException e){
+                healthTrackerDatabase.dailyCaloriesDAO().update(dailyCalories);
+            }
+        }).start();
+    }
+
+    private Future<DailyCalories> getCaloriesFromDB(String date) {
+        Callable<DailyCalories> task = () -> {
+            DailyCalories dailyCalories = null;
+            try {
+                dailyCalories = healthTrackerDatabase.dailyCaloriesDAO().getByDate(date);
+            } catch (NullPointerException e) {
+                e.printStackTrace();
+            }
+            return dailyCalories;
+        };
+
+        Future<DailyCalories> dailyCaloriesFuture = executor.submit(task);
+        return dailyCaloriesFuture;
+    }
+
+    private Future<List<DailyCalories>> getAllCaloriesFromDB() {
+        Callable<List<DailyCalories>> task = () -> {
+            List<DailyCalories> dailyCaloriesList = null;
+            try {
+                dailyCaloriesList = healthTrackerDatabase.dailyCaloriesDAO().getAll();
+            } catch (NullPointerException e) {
+                e.printStackTrace();
+            }
+            return dailyCaloriesList;
+        };
+
+        Future<List<DailyCalories>> dailyCaloriesFuture = executor.submit(task);
+        return dailyCaloriesFuture;
+    }
 
 }
 

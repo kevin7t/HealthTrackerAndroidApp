@@ -5,7 +5,6 @@ import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.Query;
 import android.arch.persistence.room.Update;
 
-import java.util.Date;
 import java.util.List;
 
 import kevin.androidhealthtracker.datamodels.DailyCalories;
@@ -18,7 +17,7 @@ public interface DailyCaloriesDAO {
 
     //TODO Must use type converter to convert date to a string and back
     @Query("SELECT * FROM dailycalories_table WHERE date = :date")
-    DailyCalories getByDate(Date date);
+    DailyCalories getByDate(String date);
 
     @Insert
     void insert(DailyCalories dailyCalories);

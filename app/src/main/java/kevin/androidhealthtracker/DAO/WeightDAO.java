@@ -5,7 +5,6 @@ import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.Query;
 import android.arch.persistence.room.Update;
 
-import java.util.Date;
 import java.util.List;
 
 import kevin.androidhealthtracker.datamodels.Weight;
@@ -17,7 +16,7 @@ public interface WeightDAO {
 
     //TODO Must use type converter to convert date to a string and back
     @Query("SELECT * FROM weight_table WHERE date = :date")
-    Weight getByDate(Date date);
+    Weight getByDate(String date);
 
     @Insert
     void insert(Weight weight);

@@ -3,13 +3,11 @@ package kevin.androidhealthtracker.datamodels;
 import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.PrimaryKey;
-
-import java.util.Date;
+import android.support.annotation.NonNull;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.NonNull;
 
 @Data
 @NoArgsConstructor
@@ -19,7 +17,8 @@ public class Weight {
 
     @PrimaryKey
     @ColumnInfo(name = "date")
-    private Date date;
+    @NonNull
+    private String date;
 
     @ColumnInfo(name = "weight")
     private Float weight;
