@@ -51,7 +51,7 @@ public class UserProgressFragment extends Fragment {
     private SharedPreferences prefs;
     private SharedPreferences.Editor editor;
     private Button increaseConsumedCalories, decreaseConsumedCalories, increaseBurntCalories, decreaseBurntCalories;
-    private EditText consumedCaloriesEditText, burntCaloriesEditText;
+    private EditText consumedCaloriesEditText, burntCaloriesEditText, weightEditText;
     private TextView goalCaloriesTextView, consumedCaloriesTextView, burntCaloriesTextView, netCaloriesTextView;
     private ExecutorService executor;
 
@@ -71,6 +71,7 @@ public class UserProgressFragment extends Fragment {
 
         consumedCaloriesEditText = view.findViewById(R.id.calorieIntakeEditText);
         burntCaloriesEditText = view.findViewById(R.id.burntCaloriesEditText);
+        weightEditText = view.findViewById(R.id.WeightEditText);
 
         increaseConsumedCalories = view.findViewById(R.id.increaseConsumedCaloriesButton);
         decreaseConsumedCalories = view.findViewById(R.id.decreaseConsumedCaloriesButton);
@@ -81,6 +82,7 @@ public class UserProgressFragment extends Fragment {
         decreaseConsumedCalories.setOnClickListener(decreaseCaloriesConsumedListener);
         increaseBurntCalories.setOnClickListener(increaseBurntCaloriesListener);
         decreaseBurntCalories.setOnClickListener(decreaseBurntCaloriesListener);
+        weightEditText.setOnClickListener(weightListener);
 
         executor = Executors.newFixedThreadPool(4);
         prefs = MainActivity.prefs;
@@ -101,6 +103,11 @@ public class UserProgressFragment extends Fragment {
         /**
          * Get weight from DB
          */
+        try {
+            weight = getTodaysWeight();
+        } catch (ExecutionException | InterruptedException | ParseException e) {
+            e.printStackTrace();
+        }
 
         try {
             USER_SETUP_STATUS_BOOLEAN = prefs.getBoolean(USER_SETUP_STATUS, false);
@@ -143,9 +150,16 @@ public class UserProgressFragment extends Fragment {
         burntCaloriesTextView.setText(burntCalories.toString());
         burntCaloriesEditText.setText(burntCalories.toString());
         netCaloriesTextView.setText(netCalories.toString());
+        weightEditText.setText(weight.toString());
         saveCaloriesToDB();
+        saveWeightToDB();
     }
 
+    private View.OnClickListener weightListener = view -> {
+        Float value = Float.valueOf(weightEditText.getText().toString());
+        weight.setWeight(value);
+        refreshProgress();
+    };
     private View.OnClickListener floatingActionButtonListener = view -> {
         Intent userSetupIntent = new Intent(getActivity(), InputUserHealthDataActivity.class);
         startActivityForResult(userSetupIntent, USER_DATA_REQUEST_CODE);
@@ -206,10 +220,9 @@ public class UserProgressFragment extends Fragment {
         } catch (ParseException e) {
             e.printStackTrace();
         }
-        Weight weight = new Weight();
         weight.setDate(date);
         weight.setWeight(60.0f);
-        saveWeightToDB(weight);
+        saveWeightToDB();
         Future<Weight> weightFuture = getWeightFromDB(date);
         if (weightFuture.isDone()) {
             try {
@@ -231,7 +244,7 @@ public class UserProgressFragment extends Fragment {
         return formatter.parse(formatter.format(new Date())).toString();
     }
 
-    private void saveWeightToDB(Weight weight) {
+    private void saveWeightToDB() {
         new Thread(() -> {
             try {
                 healthTrackerDatabase.weightDAO().insert(weight);
@@ -311,12 +324,33 @@ public class UserProgressFragment extends Fragment {
         return dailyCaloriesFuture;
     }
 
+    private Weight getTodaysWeight() throws ExecutionException, InterruptedException, ParseException {
+        Future<Weight> result = getWeightFromDB(getTodaysDate());
+        Weight weight = null;
+//        while (result.get() == null) {
+//            Thread.sleep(1000);
+//        }
+        if (result.isDone() && result.get() != null) {
+            weight = result.get();
+        }
+        if (weight == null) {
+            weight = new Weight(getTodaysDate());
+            refreshProgress();
+            return weight;
+        } else {
+            return weight;
+        }
+    }
+
     private DailyCalories getTodaysCalories() throws ExecutionException, InterruptedException, ParseException {
         Future<DailyCalories> result = getCaloriesFromDB(getTodaysDate());
         DailyCalories calories = null;
-        while (result.get() == null){
-            Thread.sleep(1000);
-        }
+        //TODO Find a way to wait for future to complete because otherwise it returns nothing
+//        while (result.get() == null) {
+//            //This will break if there is no value
+//            Thread.sleep(1000);
+//        }
+        Thread.sleep(5000);
         if (result.isDone() && result.get() != null) {
             calories = result.get();
         }
@@ -327,10 +361,6 @@ public class UserProgressFragment extends Fragment {
         } else {
             return calories;
         }
-    }
-
-    private Boolean checkIfCaloriesIsOutOfDate(DailyCalories calories) throws ParseException {
-        return !calories.getDate().equals(getTodaysDate());
     }
 
     private int getUserCalorieLevel() {

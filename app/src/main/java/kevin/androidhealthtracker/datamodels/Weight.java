@@ -15,6 +15,11 @@ import lombok.NoArgsConstructor;
 @Entity(tableName = "weight_table")
 public class Weight {
 
+    public Weight(String date){
+        this.date = date;
+        weight = 0.0f;
+    }
+
     @PrimaryKey
     @ColumnInfo(name = "date")
     @NonNull
