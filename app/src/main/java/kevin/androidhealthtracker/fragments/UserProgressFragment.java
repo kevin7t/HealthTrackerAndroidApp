@@ -52,11 +52,12 @@ public class UserProgressFragment extends Fragment {
     private SharedPreferences.Editor editor;
     private Button increaseConsumedCalories, decreaseConsumedCalories, increaseBurntCalories, decreaseBurntCalories;
     private EditText consumedCaloriesEditText, burntCaloriesEditText;
-    private Integer calories, consumedCalories, burntCalories, netCalories, progress;
+    private Integer goalCalories, consumedCalories, burntCalories, netCalories, progress;
 
     private TextView goalCaloriesTextView, consumedCaloriesTextView, burntCaloriesTextView, netCaloriesTextView;
     private ExecutorService executor;
 
+    private DailyCalories dailyCalories;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -82,12 +83,21 @@ public class UserProgressFragment extends Fragment {
         increaseBurntCalories.setOnClickListener(increaseBurntCaloriesListener);
         decreaseBurntCalories.setOnClickListener(decreaseBurntCaloriesListener);
 
-
+        executor = Executors.newFixedThreadPool(2);
         prefs = MainActivity.prefs;
         editor = this.getActivity().getSharedPreferences("SharedPreferences", Context.MODE_PRIVATE).edit();
         floatingActionButton = view.findViewById(R.id.fab);
         floatingActionButton.setOnClickListener(floatingActionButtonListener);
-
+        healthTrackerDatabase = Room.databaseBuilder(getActivity().getApplicationContext(),
+                HealthTrackerDatabase.class, DATABASE_NAME).fallbackToDestructiveMigration().build();
+        /**
+         * Get calories from DB
+         */
+        try {
+            dailyCalories = getTodaysCalories();
+        } catch (ExecutionException | InterruptedException | ParseException e) {
+            e.printStackTrace();
+        }
 
         try {
             USER_SETUP_STATUS_BOOLEAN = prefs.getBoolean(USER_SETUP_STATUS, false);
@@ -113,42 +123,28 @@ public class UserProgressFragment extends Fragment {
 
         }
 
-        healthTrackerDatabase = Room.databaseBuilder(getActivity().getApplicationContext(),
-                HealthTrackerDatabase.class, DATABASE_NAME).fallbackToDestructiveMigration().build();
 
-        executor = Executors.newWorkStealingPool();
 
-        testDB();
+//        testDB();
         return view;
     }
 
-    private void saveConsumedCalories(Integer consumedCalories) {
-        SharedPreferences.Editor editor = getActivity().getSharedPreferences("SharedPreferences", Context.MODE_PRIVATE).edit();
-        editor.putInt("consumedcalories", consumedCalories);
-        editor.apply();
-    }
-
-    private void saveBurntCalories(Integer burntCalories) {
-        SharedPreferences.Editor editor = getActivity().getSharedPreferences("SharedPreferences", Context.MODE_PRIVATE).edit();
-        editor.putInt("burntcalories", burntCalories);
-        editor.apply();
-    }
-
     private void refreshProgress() {
-        calories = prefs.getInt("lowcalories", 0);
-        consumedCalories = prefs.getInt("consumedcalories", 0);
-        burntCalories = prefs.getInt("burntcalories", 0);
+        goalCalories = dailyCalories.getGoalCalories();
+        consumedCalories = dailyCalories.getConsumedCalories();
+        burntCalories = dailyCalories.getBurntCalories();
         netCalories = consumedCalories - burntCalories;
-        double percentage = (double) netCalories / (double) calories * 100;
+        double percentage = (double) netCalories / (double) goalCalories * 100;
         progress = (int) Math.round(percentage);
 
         calorieProgressBar.setProgress(progress);
-        goalCaloriesTextView.setText(calories.toString());
+        goalCaloriesTextView.setText(goalCalories.toString());
         consumedCaloriesTextView.setText(consumedCalories.toString());
         consumedCaloriesEditText.setText(consumedCalories.toString());
         burntCaloriesTextView.setText(burntCalories.toString());
         burntCaloriesEditText.setText(burntCalories.toString());
         netCaloriesTextView.setText(netCalories.toString());
+        saveCaloriesToDB();
     }
 
     private View.OnClickListener floatingActionButtonListener = view -> {
@@ -159,7 +155,7 @@ public class UserProgressFragment extends Fragment {
     private View.OnClickListener increaseCaloriesConsumedListener = view -> {
         consumedCalories += 100;
         consumedCaloriesEditText.setText(consumedCalories.toString());
-        saveConsumedCalories(consumedCalories);
+        dailyCalories.setConsumedCalories(consumedCalories);
         refreshProgress();
     };
 
@@ -168,14 +164,14 @@ public class UserProgressFragment extends Fragment {
             consumedCalories -= 100;
         }
         consumedCaloriesEditText.setText(consumedCalories.toString());
-        saveConsumedCalories(consumedCalories);
+        dailyCalories.setConsumedCalories(consumedCalories);
         refreshProgress();
     };
 
     private View.OnClickListener increaseBurntCaloriesListener = view -> {
         burntCalories += 100;
         burntCaloriesEditText.setText(burntCalories.toString());
-        saveBurntCalories(burntCalories);
+        dailyCalories.setBurntCalories(burntCalories);
         refreshProgress();
     };
 
@@ -184,7 +180,7 @@ public class UserProgressFragment extends Fragment {
             burntCalories -= 100;
         }
         burntCaloriesEditText.setText(burntCalories.toString());
-        saveBurntCalories(burntCalories);
+        dailyCalories.setBurntCalories(burntCalories);
         refreshProgress();
     };
 
@@ -214,13 +210,16 @@ public class UserProgressFragment extends Fragment {
 
         String date = null;
         try {
-            date = getCurrentDateTImeAsString();
+            date = getTodaysDate();
         } catch (ParseException e) {
             e.printStackTrace();
         }
-        saveWeightToDB(date, 60.0f);
+        Weight weight = new Weight();
+        weight.setDate(date);
+        weight.setWeight(60.0f);
+        saveWeightToDB(weight);
         Future<Weight> weightFuture = getWeightFromDB(date);
-        if (weightFuture.isDone()){
+        if (weightFuture.isDone()) {
             try {
                 System.out.println(weightFuture.get().toString());
             } catch (InterruptedException | ExecutionException e) {
@@ -232,25 +231,20 @@ public class UserProgressFragment extends Fragment {
         } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
         }
-
-
     }
 
-    private String getCurrentDateTImeAsString() throws ParseException {
+    private String getTodaysDate() throws ParseException {
         SimpleDateFormat formatter = new SimpleDateFormat(
                 "dd/MM/yyyy");
         return formatter.parse(formatter.format(new Date())).toString();
     }
 
-    private void saveWeightToDB(String date, float weight) {
+    private void saveWeightToDB(Weight weight) {
         new Thread(() -> {
-            Weight weightObj = new Weight();
-            weightObj.setDate(date);
-            weightObj.setWeight(weight);
             try {
-                healthTrackerDatabase.weightDAO().insert(weightObj);
-            }catch (SQLiteConstraintException e){
-                healthTrackerDatabase.weightDAO().update(weightObj);
+                healthTrackerDatabase.weightDAO().insert(weight);
+            } catch (SQLiteConstraintException e) {
+                healthTrackerDatabase.weightDAO().update(weight);
             }
         }).start();
     }
@@ -285,16 +279,11 @@ public class UserProgressFragment extends Fragment {
         return weightFuture;
     }
 
-    private void saveCaloriestToDB(String date, int goal, int consumed, int burnt) {
+    private void saveCaloriesToDB() {
         new Thread(() -> {
-            DailyCalories dailyCalories = new DailyCalories();
-            dailyCalories.setDate(date);
-            dailyCalories.setBurntCalories(burnt);
-            dailyCalories.setConsumedCalories(consumed);
-            dailyCalories.setBurntCalories(burnt);
             try {
                 healthTrackerDatabase.dailyCaloriesDAO().insert(dailyCalories);
-            }catch (SQLiteConstraintException e){
+            } catch (SQLiteConstraintException e) {
                 healthTrackerDatabase.dailyCaloriesDAO().update(dailyCalories);
             }
         }).start();
@@ -328,6 +317,33 @@ public class UserProgressFragment extends Fragment {
 
         Future<List<DailyCalories>> dailyCaloriesFuture = executor.submit(task);
         return dailyCaloriesFuture;
+    }
+
+    private DailyCalories getTodaysCalories() throws ExecutionException, InterruptedException, ParseException {
+        Future<DailyCalories> result = getCaloriesFromDB(getTodaysDate());
+        DailyCalories calories = null;
+        if (result.isDone()){
+            calories = result.get();
+        }
+        if(calories == null){
+            dailyCalories = new DailyCalories(getTodaysDate(),getUserCalorieLevel());
+            saveCaloriesToDB();
+            refreshProgress();
+            return dailyCalories;
+        } else {
+            return calories;
+        }
+    }
+
+    private Boolean checkIfCaloriesIsOutOfDate(DailyCalories calories) throws ParseException {
+        if (calories.getDate().equals(getTodaysDate())) {
+            return false;
+        }
+        return true;
+    }
+
+    private int getUserCalorieLevel() {
+        return prefs.getInt("lowcalories", 0);
     }
 
 }

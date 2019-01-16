@@ -8,14 +8,20 @@ import android.support.annotation.NonNull;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
 @Entity(tableName = "dailycalories_table")
 public class DailyCalories {
+
+    public DailyCalories(String date, int goalCalories){
+        this.date = date;
+        this.goalCalories = goalCalories;
+        consumedCalories = 0;
+        burntCalories = 0;
+    }
+
     @PrimaryKey
     @ColumnInfo(name = "date")
     @NonNull
