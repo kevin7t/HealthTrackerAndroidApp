@@ -23,8 +23,6 @@ public class InputUserHealthDataActivity extends AppCompatActivity {
     private Switch genderSwitchItem;
     private EditText ageEditText, weightEditText, heightEditText;
     private String gender = Gender.Male;
-    private int age;
-    private String weight,height;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

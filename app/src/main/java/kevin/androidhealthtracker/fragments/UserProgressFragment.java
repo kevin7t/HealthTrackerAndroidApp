@@ -52,12 +52,11 @@ public class UserProgressFragment extends Fragment {
     private SharedPreferences.Editor editor;
     private Button increaseConsumedCalories, decreaseConsumedCalories, increaseBurntCalories, decreaseBurntCalories;
     private EditText consumedCaloriesEditText, burntCaloriesEditText;
-    private Integer goalCalories, consumedCalories, burntCalories, netCalories, progress;
-
     private TextView goalCaloriesTextView, consumedCaloriesTextView, burntCaloriesTextView, netCaloriesTextView;
     private ExecutorService executor;
 
     private DailyCalories dailyCalories;
+    private Weight weight;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -83,7 +82,7 @@ public class UserProgressFragment extends Fragment {
         increaseBurntCalories.setOnClickListener(increaseBurntCaloriesListener);
         decreaseBurntCalories.setOnClickListener(decreaseBurntCaloriesListener);
 
-        executor = Executors.newFixedThreadPool(2);
+        executor = Executors.newFixedThreadPool(4);
         prefs = MainActivity.prefs;
         editor = this.getActivity().getSharedPreferences("SharedPreferences", Context.MODE_PRIVATE).edit();
         floatingActionButton = view.findViewById(R.id.fab);
@@ -99,16 +98,17 @@ public class UserProgressFragment extends Fragment {
             e.printStackTrace();
         }
 
+        /**
+         * Get weight from DB
+         */
+
         try {
             USER_SETUP_STATUS_BOOLEAN = prefs.getBoolean(USER_SETUP_STATUS, false);
         } catch (NullPointerException e) {
             e.printStackTrace();
         }
-        //TODO: Reset calorie tracking per day, use prefs to store string of date and match to current date on activity launch
 
-
-        //TODO: save weight and calories to database and retrieve them on activity creation
-        //First store user details, then store the weight with a date for the graph
+        //TODO: save weight to database and retrieve them on activity creation
 
         if (USER_SETUP_STATUS_BOOLEAN == false) {
             //Show user profile setup fragment
@@ -124,18 +124,17 @@ public class UserProgressFragment extends Fragment {
         }
 
 
-
 //        testDB();
         return view;
     }
 
     private void refreshProgress() {
-        goalCalories = dailyCalories.getGoalCalories();
-        consumedCalories = dailyCalories.getConsumedCalories();
-        burntCalories = dailyCalories.getBurntCalories();
-        netCalories = consumedCalories - burntCalories;
+        Integer goalCalories = dailyCalories.getGoalCalories();
+        Integer consumedCalories = dailyCalories.getConsumedCalories();
+        Integer burntCalories = dailyCalories.getBurntCalories();
+        Integer netCalories = consumedCalories - burntCalories;
         double percentage = (double) netCalories / (double) goalCalories * 100;
-        progress = (int) Math.round(percentage);
+        Integer progress = (int) Math.round(percentage);
 
         calorieProgressBar.setProgress(progress);
         goalCaloriesTextView.setText(goalCalories.toString());
@@ -153,40 +152,33 @@ public class UserProgressFragment extends Fragment {
     };
 
     private View.OnClickListener increaseCaloriesConsumedListener = view -> {
-        consumedCalories += 100;
-        consumedCaloriesEditText.setText(consumedCalories.toString());
-        dailyCalories.setConsumedCalories(consumedCalories);
+        dailyCalories.incrementConsumedCalories(100);
+        consumedCaloriesEditText.setText(Integer.toString(dailyCalories.getConsumedCalories()));
         refreshProgress();
     };
 
     private View.OnClickListener decreaseCaloriesConsumedListener = view -> {
-        if (consumedCalories - 100 >= 0) {
-            consumedCalories -= 100;
-        }
-        consumedCaloriesEditText.setText(consumedCalories.toString());
-        dailyCalories.setConsumedCalories(consumedCalories);
+        dailyCalories.incrementBurntCalories(100);
+        consumedCaloriesEditText.setText(Integer.toString(dailyCalories.getConsumedCalories()));
         refreshProgress();
     };
 
     private View.OnClickListener increaseBurntCaloriesListener = view -> {
-        burntCalories += 100;
-        burntCaloriesEditText.setText(burntCalories.toString());
-        dailyCalories.setBurntCalories(burntCalories);
+        dailyCalories.incrementBurntCalories(100);
+        burntCaloriesEditText.setText(Integer.toString(dailyCalories.getBurntCalories()));
         refreshProgress();
     };
 
     private View.OnClickListener decreaseBurntCaloriesListener = view -> {
-        if (burntCalories - 100 >= 0) {
-            burntCalories -= 100;
-        }
-        burntCaloriesEditText.setText(burntCalories.toString());
-        dailyCalories.setBurntCalories(burntCalories);
+        dailyCalories.decrementBurntCalories(100);
+        burntCaloriesEditText.setText(Integer.toString(dailyCalories.getBurntCalories()));
         refreshProgress();
     };
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        //If user has come from the setup activity then refresh the items
         if (requestCode == USER_DATA_REQUEST_CODE) {
             if (resultCode == RESULT_OK) {
                 try {
@@ -322,12 +314,14 @@ public class UserProgressFragment extends Fragment {
     private DailyCalories getTodaysCalories() throws ExecutionException, InterruptedException, ParseException {
         Future<DailyCalories> result = getCaloriesFromDB(getTodaysDate());
         DailyCalories calories = null;
-        if (result.isDone()){
+        while (result.get() == null){
+            Thread.sleep(1000);
+        }
+        if (result.isDone() && result.get() != null) {
             calories = result.get();
         }
-        if(calories == null){
-            dailyCalories = new DailyCalories(getTodaysDate(),getUserCalorieLevel());
-            saveCaloriesToDB();
+        if (calories == null) {
+            dailyCalories = new DailyCalories(getTodaysDate(), getUserCalorieLevel());
             refreshProgress();
             return dailyCalories;
         } else {
@@ -336,10 +330,7 @@ public class UserProgressFragment extends Fragment {
     }
 
     private Boolean checkIfCaloriesIsOutOfDate(DailyCalories calories) throws ParseException {
-        if (calories.getDate().equals(getTodaysDate())) {
-            return false;
-        }
-        return true;
+        return !calories.getDate().equals(getTodaysDate());
     }
 
     private int getUserCalorieLevel() {

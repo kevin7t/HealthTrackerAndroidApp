@@ -15,7 +15,7 @@ import lombok.Data;
 @Entity(tableName = "dailycalories_table")
 public class DailyCalories {
 
-    public DailyCalories(String date, int goalCalories){
+    public DailyCalories(String date, int goalCalories) {
         this.date = date;
         this.goalCalories = goalCalories;
         consumedCalories = 0;
@@ -35,5 +35,26 @@ public class DailyCalories {
 
     @ColumnInfo(name = "burntcalories")
     private int burntCalories;
+
+    public void incrementConsumedCalories(int value) {
+        consumedCalories += value;
+    }
+
+    public void decrementConsumedCalories(int value) {
+        if (consumedCalories - value >= 0) {
+            consumedCalories -= value;
+        }
+    }
+
+    public void incrementBurntCalories(int value) {
+        burntCalories += value;
+    }
+
+    public void decrementBurntCalories(int value) {
+        if (burntCalories - value >= 0) {
+            burntCalories -= value;
+        }
+    }
+
 
 }
