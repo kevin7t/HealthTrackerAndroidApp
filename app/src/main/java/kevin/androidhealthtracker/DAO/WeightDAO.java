@@ -18,6 +18,9 @@ public interface WeightDAO {
     @Query("SELECT * FROM weight_table WHERE date = :date")
     Weight getByDate(String date);
 
+    @Query("SELECT * FROM weight_table ORDER BY date DESC LIMIT 1")
+    Weight getLatest();
+
     @Insert
     void insert(Weight weight);
 

@@ -172,10 +172,12 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:autoText="false"
                     android:text="70KG"
                     android:textColor="@color/colorAccent"
-                    android:textSize="18sp" />
+                    android:textSize="18sp"
+                    android:singleLine="true"
+                    android:inputType="numberDecimal"
+                    android:imeOptions="actionDone"/>
 
             </LinearLayout>
         </android.support.v7.widget.CardView>
