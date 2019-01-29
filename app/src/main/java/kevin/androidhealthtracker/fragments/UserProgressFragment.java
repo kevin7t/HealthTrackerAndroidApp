@@ -24,7 +24,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -33,6 +32,7 @@ import kevin.androidhealthtracker.MainActivity;
 import kevin.androidhealthtracker.R;
 import kevin.androidhealthtracker.database.HealthTrackerDatabase;
 import kevin.androidhealthtracker.datamodels.DailyCalories;
+import kevin.androidhealthtracker.datamodels.UserCalorieProfile;
 import kevin.androidhealthtracker.datamodels.Weight;
 
 import static android.app.Activity.RESULT_OK;
@@ -92,6 +92,16 @@ public class UserProgressFragment extends Fragment {
         floatingActionButton.setOnClickListener(floatingActionButtonListener);
         healthTrackerDatabase = Room.databaseBuilder(getActivity().getApplicationContext(),
                 HealthTrackerDatabase.class, DATABASE_NAME).allowMainThreadQueries().fallbackToDestructiveMigration().build();
+        try {
+            USER_SETUP_STATUS_BOOLEAN = prefs.getBoolean(USER_SETUP_STATUS, false);
+        } catch (NullPointerException e) {
+            e.printStackTrace();
+        }
+        if (USER_SETUP_STATUS_BOOLEAN == false) {
+            //Show user profile setup fragment
+            Intent userSetupIntent = new Intent(getActivity(), InputUserHealthDataActivity.class);
+            startActivityForResult(userSetupIntent, USER_DATA_REQUEST_CODE);
+        }
         /**
          * Get calories from DB
          */
@@ -109,27 +119,10 @@ public class UserProgressFragment extends Fragment {
         } catch (ParseException e) {
             e.printStackTrace();
         }
-
-        try {
-            USER_SETUP_STATUS_BOOLEAN = prefs.getBoolean(USER_SETUP_STATUS, false);
-        } catch (NullPointerException e) {
-            e.printStackTrace();
-        }
-
+        refreshProgress();
         //TODO: save weight to database and retrieve them on activity creation
 
-        if (USER_SETUP_STATUS_BOOLEAN == false) {
-            //Show user profile setup fragment
-            Intent userSetupIntent = new Intent(getActivity(), InputUserHealthDataActivity.class);
-            startActivityForResult(userSetupIntent, USER_DATA_REQUEST_CODE);
-        } else {
-            try {
-                refreshProgress();
-            } catch (Resources.NotFoundException e) {
-                e.printStackTrace();
-            }
 
-        }
 
         return view;
     }
@@ -208,6 +201,18 @@ public class UserProgressFragment extends Fragment {
             if (resultCode == RESULT_OK) {
                 try {
                     USER_SETUP_STATUS_BOOLEAN = prefs.getBoolean(USER_SETUP_STATUS, false);
+                    try {
+                        UserCalorieProfile profile = getUserCalorieProfileFromDB();
+                        dailyCalories = new DailyCalories(getTodaysDate(),profile.getLowCalories());
+                        weight = new Weight(getTodaysDate());
+                        weight.setWeight(profile.getWeight());
+
+                        saveCaloriesToDB();
+                        saveWeightToDB();
+
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
                     refreshProgress();
                 } catch (Resources.NotFoundException e) {
                     e.printStackTrace();
@@ -258,11 +263,15 @@ public class UserProgressFragment extends Fragment {
         return healthTrackerDatabase.dailyCaloriesDAO().getAll();
     }
 
+    private UserCalorieProfile getUserCalorieProfileFromDB(){
+        return healthTrackerDatabase.userCalorieProfileDAO().getLatest();
+    }
+
     private Weight getTodaysWeight() throws ParseException {
         weight = getWeightFromDB();
         if (weight == null) {
             weight = new Weight(getTodaysDate());
-            refreshProgress();
+            weight.setWeight(getUserWeightFromSetup());
             return weight;
         } else {
             return weight;
@@ -272,17 +281,20 @@ public class UserProgressFragment extends Fragment {
     private DailyCalories getTodaysCalories() throws ParseException {
         DailyCalories calories = getCaloriesFromDB(getTodaysDate());
         if (calories == null) {
-            dailyCalories = new DailyCalories(getTodaysDate(), getUserCalorieLevel());
-            refreshProgress();
+            dailyCalories = new DailyCalories(getTodaysDate(), getUserCalorieLevelFromSetup());
             return dailyCalories;
         } else {
             return calories;
         }
     }
 
-    private int getUserCalorieLevel() {
-        return prefs.getInt("lowcalories", 0);
+    private int getUserCalorieLevelFromSetup() {
+        UserCalorieProfile profile = healthTrackerDatabase.userCalorieProfileDAO().getLatest();
+        return profile.getLowCalories();
     }
-
+    private float getUserWeightFromSetup() {
+        UserCalorieProfile profile = healthTrackerDatabase.userCalorieProfileDAO().getLatest();
+        return profile.getWeight();
+    }
 }
 
