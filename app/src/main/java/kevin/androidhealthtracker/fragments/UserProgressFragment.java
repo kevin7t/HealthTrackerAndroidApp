@@ -56,6 +56,7 @@ public class UserProgressFragment extends Fragment {
     private TextView goalCaloriesTextView, consumedCaloriesTextView, burntCaloriesTextView, netCaloriesTextView;
     private ExecutorService executor;
 
+    private UserCalorieProfile userCalorieProfile;
     private DailyCalories dailyCalories;
     private Weight weight;
 
@@ -92,36 +93,46 @@ public class UserProgressFragment extends Fragment {
         floatingActionButton.setOnClickListener(floatingActionButtonListener);
         healthTrackerDatabase = Room.databaseBuilder(getActivity().getApplicationContext(),
                 HealthTrackerDatabase.class, DATABASE_NAME).allowMainThreadQueries().fallbackToDestructiveMigration().build();
-        try {
-            USER_SETUP_STATUS_BOOLEAN = prefs.getBoolean(USER_SETUP_STATUS, false);
-        } catch (NullPointerException e) {
-            e.printStackTrace();
-        }
-        if (USER_SETUP_STATUS_BOOLEAN == false) {
-            //Show user profile setup fragment
+//        try {
+//            USER_SETUP_STATUS_BOOLEAN = prefs.getBoolean(USER_SETUP_STATUS, false);
+//        } catch (NullPointerException e) {
+//            e.printStackTrace();
+//        }
+//        if (USER_SETUP_STATUS_BOOLEAN == false) {
+//            //Show user profile setup fragment
+//            Intent userSetupIntent = new Intent(getActivity(), InputUserHealthDataActivity.class);
+//            startActivityForResult(userSetupIntent, USER_DATA_REQUEST_CODE);
+//        }
+
+
+        userCalorieProfile = getUserCalorieProfile();
+        if (userCalorieProfile == null) {
             Intent userSetupIntent = new Intent(getActivity(), InputUserHealthDataActivity.class);
             startActivityForResult(userSetupIntent, USER_DATA_REQUEST_CODE);
-        }
-        /**
-         * Get calories from DB
-         */
-        try {
-            dailyCalories = getTodaysCalories();
-        } catch (ParseException e) {
-            e.printStackTrace();
+        }else {
+            /**
+             * Get calories from DB
+             */
+            try {
+                dailyCalories = getTodaysCalories();
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+
+            /**
+             * Get weight from DB
+             */
+            try {
+                weight = getTodaysWeight();
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            refreshProgress();
         }
 
-        /**
-         * Get weight from DB
-         */
-        try {
-            weight = getTodaysWeight();
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-        refreshProgress();
+
+
         //TODO: save weight to database and retrieve them on activity creation
-
 
 
         return view;
@@ -142,19 +153,19 @@ public class UserProgressFragment extends Fragment {
         burntCaloriesTextView.setText(burntCalories.toString());
         burntCaloriesEditText.setText(burntCalories.toString());
         netCaloriesTextView.setText(netCalories.toString());
-        weightEditText.setText(weight.getWeight().toString()+"kg");
+        weightEditText.setText(weight.getWeight().toString() + "kg");
     }
 
     private TextView.OnEditorActionListener weightListener = new TextView.OnEditorActionListener() {
         @Override
         public boolean onEditorAction(TextView textView, int actionId, KeyEvent keyEvent) {
-            if (actionId == EditorInfo.IME_ACTION_DONE){
+            if (actionId == EditorInfo.IME_ACTION_DONE) {
                 Float value = Float.valueOf(weightEditText.getText().toString());
                 weight.setWeight(value);
                 refreshProgress();
                 saveWeightToDB();
                 InputMethodManager imm = (InputMethodManager) view.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
-                imm.hideSoftInputFromWindow(view.getWindowToken(),0);
+                imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
                 return true;
             }
             return false;
@@ -202,8 +213,8 @@ public class UserProgressFragment extends Fragment {
                 try {
                     USER_SETUP_STATUS_BOOLEAN = prefs.getBoolean(USER_SETUP_STATUS, false);
                     try {
-                        UserCalorieProfile profile = getUserCalorieProfileFromDB();
-                        dailyCalories = new DailyCalories(getTodaysDate(),profile.getLowCalories());
+                        UserCalorieProfile profile = getUserCalorieProfile();
+                        dailyCalories = new DailyCalories(getTodaysDate(), profile.getLowCalories());
                         weight = new Weight(getTodaysDate());
                         weight.setWeight(profile.getWeight());
 
@@ -263,15 +274,11 @@ public class UserProgressFragment extends Fragment {
         return healthTrackerDatabase.dailyCaloriesDAO().getAll();
     }
 
-    private UserCalorieProfile getUserCalorieProfileFromDB(){
-        return healthTrackerDatabase.userCalorieProfileDAO().getLatest();
-    }
-
     private Weight getTodaysWeight() throws ParseException {
         weight = getWeightFromDB();
         if (weight == null) {
             weight = new Weight(getTodaysDate());
-            weight.setWeight(getUserWeightFromSetup());
+            weight.setWeight(userCalorieProfile.getWeight());
             return weight;
         } else {
             return weight;
@@ -281,20 +288,16 @@ public class UserProgressFragment extends Fragment {
     private DailyCalories getTodaysCalories() throws ParseException {
         DailyCalories calories = getCaloriesFromDB(getTodaysDate());
         if (calories == null) {
-            dailyCalories = new DailyCalories(getTodaysDate(), getUserCalorieLevelFromSetup());
+            dailyCalories = new DailyCalories(getTodaysDate(), userCalorieProfile.getLowCalories());
             return dailyCalories;
         } else {
             return calories;
         }
     }
 
-    private int getUserCalorieLevelFromSetup() {
-        UserCalorieProfile profile = healthTrackerDatabase.userCalorieProfileDAO().getLatest();
-        return profile.getLowCalories();
+    private UserCalorieProfile getUserCalorieProfile() {
+        return healthTrackerDatabase.userCalorieProfileDAO().getLatest();
     }
-    private float getUserWeightFromSetup() {
-        UserCalorieProfile profile = healthTrackerDatabase.userCalorieProfileDAO().getLatest();
-        return profile.getWeight();
-    }
+
 }
 

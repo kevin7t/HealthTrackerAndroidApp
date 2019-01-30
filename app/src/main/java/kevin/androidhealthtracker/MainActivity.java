@@ -69,6 +69,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         headerView.setOnClickListener(loginOnClickListener);
         toolbar.setTitle("Home Feed");
 
+        if (!(loggedIn = prefs.getBoolean("loggedIn", false))) {
+            showLoginActivity();
+        }
+
+
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
@@ -76,6 +81,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         setSupportActionBar(toolbar);
         loadMainFragment();
         setUserToTextView();
+
     }
 
     /*
@@ -128,11 +134,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             if (loggedIn) {
                 showAlertDialog();
             } else {
-                Intent login = new Intent(MainActivity.this, LoginActivity.class);
-                startActivityForResult(login, LOGIN_REQUEST_CODE);
+                showLoginActivity();
             }
         }
     };
+
+    private void showLoginActivity() {
+        Intent login = new Intent(MainActivity.this, LoginActivity.class);
+        startActivityForResult(login, LOGIN_REQUEST_CODE);
+    }
 
     private void loadMainFragment() {
         transaction = getFragmentManager().beginTransaction();
