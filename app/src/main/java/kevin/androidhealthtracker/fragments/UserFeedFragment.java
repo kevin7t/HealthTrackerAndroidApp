@@ -6,7 +6,6 @@ import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -30,16 +29,17 @@ import kevin.androidhealthtracker.WebClient;
 import kevin.androidhealthtracker.adapters.StatusListAdapter;
 
 public class UserFeedFragment extends Fragment {
-    private UserFeedRefreshTask userFeedRefreshTask;
-    private WebClient client;
-    private SharedPreferences prefs;
-    private List<StatusDTO> statusList;
+    protected UserFeedRefreshTask userFeedRefreshTask;
+    protected WebClient client;
+    protected SharedPreferences prefs;
+    protected List<StatusDTO> statusList;
 
-    private View view;
-    private ListView listView;
+    protected View view;
+    protected ListView listView;
 
-    private FloatingActionButton floatingActionButton;
-    private SwipeRefreshLayout homeSwipeRefreshLayout;
+    protected FloatingActionButton floatingActionButton;
+    protected SwipeRefreshLayout homeSwipeRefreshLayout;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -69,6 +69,7 @@ public class UserFeedFragment extends Fragment {
 
         @Override
         public void onScrollStateChanged(AbsListView absListView, int i) {
+
         }
 
         @Override
@@ -83,6 +84,7 @@ public class UserFeedFragment extends Fragment {
             }
         }
     };
+
     /*
      * Listview refresh actions
      */
@@ -94,7 +96,7 @@ public class UserFeedFragment extends Fragment {
         }
     };
 
-    private void refreshUserFeed() {
+    protected void refreshUserFeed() {
         if (prefs.getInt("userId", 0) != 0) {
             userFeedRefreshTask = new UserFeedRefreshTask();
             userFeedRefreshTask.execute();

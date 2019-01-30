@@ -3,7 +3,11 @@
         
     <group android:checkableBehavior="single">
 
-
+        <item
+            android:id="@+id/profileMenuItem"
+            android:checked="false"
+            android:icon="@drawable/ic_account_circle_white_36dp"
+            android:title="@string/title_activity_profile" />
         <item
             android:id="@+id/friendlistMenuItem"
             android:checked="false"
