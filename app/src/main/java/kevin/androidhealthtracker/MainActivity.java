@@ -3,6 +3,7 @@ package kevin.androidhealthtracker;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -21,11 +22,11 @@ import android.widget.Toast;
 
 import org.springframework.web.client.RestTemplate;
 
-import kevin.androidhealthtracker.fragments.FragmentThree;
 import kevin.androidhealthtracker.fragments.FragmentTwo;
 import kevin.androidhealthtracker.fragments.LogoutFragment;
 import kevin.androidhealthtracker.fragments.ProfileFeedFragment;
 import kevin.androidhealthtracker.fragments.UserFeedFragment;
+import kevin.androidhealthtracker.fragments.UserProgressFragment;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
     public static SharedPreferences prefs;
@@ -67,6 +68,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         navigationView.setNavigationItemSelectedListener(this);
         bottomNavigationView.setOnNavigationItemSelectedListener(navigationItemSelectedListener);
         headerView.setOnClickListener(loginOnClickListener);
+        toolbar.setTitle("Home Feed");
+
+        if (!(loggedIn = prefs.getBoolean("loggedIn", false))) {
+            showLoginActivity();
+        }
+
 
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -75,6 +82,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         setSupportActionBar(toolbar);
         loadMainFragment();
         setUserToTextView();
+
     }
 
     /*
@@ -91,12 +99,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             if (id == R.id.fragment_home) {
                 setTitle(R.string.title_activity_activity_feed);
                 fragmentClass = UserFeedFragment.class;
-                //Todo: From fragment home/news feed once you go into replies that will replace this fragment, therefore must
-                //add the old fragment to backstack
+                toolbar.setTitle("Home Feed");
             } else if (id == R.id.fragment2) {
                 fragmentClass = FragmentTwo.class;
-            } else if (id == R.id.fragment3) {
-                fragmentClass = FragmentThree.class;
+            } else if (id == R.id.fragment_progress) {
+                fragmentClass = UserProgressFragment.class;
+                toolbar.setTitle("Progress");
             }
 
             try {
@@ -128,11 +136,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             if (loggedIn) {
                 showLogoutDialog();
             } else {
-                Intent login = new Intent(MainActivity.this, LoginActivity.class);
-                startActivityForResult(login, LOGIN_REQUEST_CODE);
+                showLoginActivity();
             }
         }
     };
+
+    private void showLoginActivity() {
+        Intent login = new Intent(MainActivity.this, LoginActivity.class);
+        startActivityForResult(login, LOGIN_REQUEST_CODE);
+    }
 
     private void loadMainFragment() {
         transaction = getFragmentManager().beginTransaction();
@@ -208,11 +220,18 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
-        switch (item.getItemId()){
+        switch (item.getItemId()) {
             case R.id.friendlistMenuItem:
                 Intent friendListActivityIntent = new Intent(MainActivity.this, FriendListActivity.class);
                 startActivity(friendListActivityIntent);
                 break;
+
+            case R.id.clearLocalProfileMenuItem:
+                SharedPreferences.Editor editor = getSharedPreferences("SharedPreferences", Context.MODE_PRIVATE).edit();
+
+                editor.putBoolean("user_setup_status", false);
+                editor.apply();
+
             case R.id.profileMenuItem:
                 loadProfileFragment();
                 break;
