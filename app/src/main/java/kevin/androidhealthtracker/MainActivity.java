@@ -24,6 +24,7 @@ import org.springframework.web.client.RestTemplate;
 import kevin.androidhealthtracker.fragments.FragmentThree;
 import kevin.androidhealthtracker.fragments.FragmentTwo;
 import kevin.androidhealthtracker.fragments.LogoutFragment;
+import kevin.androidhealthtracker.fragments.MyAchievementsFragment;
 import kevin.androidhealthtracker.fragments.ProfileFeedFragment;
 import kevin.androidhealthtracker.fragments.UserFeedFragment;
 
@@ -93,8 +94,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 fragmentClass = UserFeedFragment.class;
                 //Todo: From fragment home/news feed once you go into replies that will replace this fragment, therefore must
                 //add the old fragment to backstack
-            } else if (id == R.id.fragment2) {
-                fragmentClass = FragmentTwo.class;
+            } else if (id == R.id.fragment_achievements) {
+                fragmentClass = MyAchievementsFragment.class;
             } else if (id == R.id.fragment3) {
                 fragmentClass = FragmentThree.class;
             }
