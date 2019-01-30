@@ -24,8 +24,7 @@ public class NewStatusActivity extends AppCompatActivity {
     private PostStatusTask postStatusTask = null;
     private int userId;
     private String userName;
-    private TextView statusTextview;
-    private TextView usernameTextview;
+    private TextView statusTextview, usernameTextview;
     private Spinner statusTypeSpinner;
 
     @Override
@@ -33,6 +32,7 @@ public class NewStatusActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_status);
         Toolbar toolbar = findViewById(R.id.toolbar);
+        toolbar.setTitle("Create New Status");
         setSupportActionBar(toolbar);
         client = MainActivity.client;
         prefs = getSharedPreferences("SharedPreferences", MODE_PRIVATE);
@@ -42,10 +42,11 @@ public class NewStatusActivity extends AppCompatActivity {
         usernameTextview = findViewById(R.id.userNameTextView);
         statusTextview = findViewById(R.id.statusContentTextView);
         statusTypeSpinner = findViewById(R.id.statusTypeSpinner);
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,R.array.status_type, android.R.layout.simple_spinner_item);
+
+        usernameTextview.setText("Username: " + userName);
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.status_type, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(R.layout.spinner_dropdown_item);
         statusTypeSpinner.setAdapter(adapter);
-        //TODO Set username but it comes up as null
     }
 
     private void postStatus() {
@@ -68,20 +69,20 @@ public class NewStatusActivity extends AppCompatActivity {
                 statusType = StatusType.RUN;
                 break;
             case "Sprint":
-                statusType =  StatusType.SPRINT;
-            break;
+                statusType = StatusType.SPRINT;
+                break;
             case "Swim":
                 statusType = StatusType.SWIM;
-            break;
+                break;
             case "Bike":
                 statusType = StatusType.BIKE;
-            break;
+                break;
             case "Row":
                 statusType = StatusType.ROW;
-            break;
+                break;
             case "Weights":
                 statusType = StatusType.WEIGHT;
-            break;
+                break;
 
 
             default:
@@ -92,6 +93,7 @@ public class NewStatusActivity extends AppCompatActivity {
 
     /**
      * Inflate top menu to allow buttons to be shown
+     *
      * @param menu
      * @return
      */
@@ -102,7 +104,6 @@ public class NewStatusActivity extends AppCompatActivity {
     }
 
     /**
-     *
      * @param item
      * @return
      */

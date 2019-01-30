@@ -9,15 +9,18 @@ import com.kevin.healthtracker.datamodels.dto.StatusDTO;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.util.HashMap;
+
 
 public class WebClient {
     private String url;
     private RestTemplate restTemplate;
 
-    public WebClient(RestTemplate restTemplate, String host, int port ){
+    public WebClient(RestTemplate restTemplate, String host, int port) {
         this.url = String.format("http://%s:%d/healthtracker", host, port);
         this.restTemplate = restTemplate;
     }
+
     public User registerUser(User user) {
         return restTemplate.postForObject(url + "/users/register", user, User.class);
     }
@@ -33,6 +36,7 @@ public class WebClient {
     public User getUser(int id) {
         return restTemplate.getForObject(url + "/users/" + id, User.class);
     }
+
     public User getUserByUserName(String userName) {
         return restTemplate.getForObject(url + "/users/searchuser/" + userName, User.class);
     }
@@ -45,7 +49,6 @@ public class WebClient {
         restTemplate.delete(url + "/users/" + id);
     }
 
-    //Todo null object as request?
     public Friend addFriend(int user1Id, int user2Id) {
         return restTemplate.postForObject(String.format("%s/users/addfriend/%s/%s", url, user1Id, user2Id), null, Friend.class);
     }
@@ -74,8 +77,12 @@ public class WebClient {
         return restTemplate.getForObject(String.format("%s/users/getfriend/%s/%s", url, user1Id, user2Id), Friend.class);
     }
 
+    public void increaseScore(int user, int score) {
+        restTemplate.put(String.format("%s/usersuserscore/%s/%s", url, user, score), null);
+    }
+
     /**
-     * User feed functions
+     * UserCalorieProfile feed functions
      */
 
     public StatusDTO createStatus(StatusDTO statusDTO) {
