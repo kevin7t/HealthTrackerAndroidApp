@@ -78,7 +78,7 @@ public class WebClient {
     }
 
     public void increaseScore(int user, int score) {
-        restTemplate.put(String.format("%s/usersuserscore/%s/%s", url, user, score), null);
+        restTemplate.put(String.format("%s/userscore/%s/%s", url, user, score), null);
     }
 
     /**
