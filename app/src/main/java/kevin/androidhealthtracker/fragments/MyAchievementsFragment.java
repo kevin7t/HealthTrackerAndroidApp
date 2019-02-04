@@ -73,9 +73,6 @@ public class MyAchievementsFragment extends Fragment {
         }
         ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity().getApplicationContext(), R.layout.list_item, achievements);
         achievementsListView.setAdapter(adapter);
-        //TODO Create list of achievements and then divide them to the user score
-
-
         return view;
     }
 
