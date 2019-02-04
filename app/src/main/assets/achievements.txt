@@ -1,3 +1,4 @@
-Beginner
-Great start
-Keep going
+100,Beginner
+150,Great start
+400,Keep going
+500,500Beyond
