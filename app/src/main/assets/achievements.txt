@@ -1,4 +1,10 @@
 100,Beginner
 150,Great start
 400,Keep going
-500,500Beyond
+500,Rookie
+600,Amateur athlete
+700,Gained 700 points
+800,Keep going!
+950,Active user
+1000,1000 points!
+1500,Long term user

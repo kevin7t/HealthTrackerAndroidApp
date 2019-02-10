@@ -12,6 +12,8 @@ import android.widget.TextView;
 
 import com.kevin.healthtracker.datamodels.dto.StatusDTO;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 import kevin.androidhealthtracker.R;
@@ -38,9 +40,12 @@ public class StatusListAdapter extends ArrayAdapter<StatusDTO> {
         TextView statusTextView = convertView.findViewById(R.id.statusContentTextView);
         TextView dateTimeTextView = convertView.findViewById(R.id.statusDateTimeView);
 
-        userNameTextView.setText("User: " + statusDTOList.get(position).getUserName());
-        dateTimeTextView.setText(statusDTOList.get(position).getCreatedAt().toString());
-        statusTextView.setText(statusDTOList.get(position).getContent());
+        StatusDTO statusDTO = statusDTOList.get(position);
+        userNameTextView.setText("User: " + statusDTO.getUserName());
+        Date date = statusDTO.getCreatedAt();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+        dateTimeTextView.setText(statusDTO.getType() + ": " + dateFormat.format(date));
+        statusTextView.setText( statusDTO.getContent());
         return convertView;
     }
 

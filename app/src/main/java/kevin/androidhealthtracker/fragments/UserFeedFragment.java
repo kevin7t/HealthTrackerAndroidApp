@@ -131,7 +131,7 @@ public class UserFeedFragment extends Fragment {
         protected void onPostExecute(Boolean aBoolean) {
             super.onPostExecute(aBoolean);
             try {
-                Collections.sort(statusList, Comparator.comparing(StatusDTO::getCreatedAt).reversed());
+                Collections.sort(statusList, Comparator.comparing(StatusDTO::getId).reversed());
                 StatusListAdapter customListViewAdapter = new StatusListAdapter(getActivity(), statusList);
                 listView.setAdapter(customListViewAdapter);
             } catch (NullPointerException e) {

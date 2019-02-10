@@ -9,8 +9,6 @@ import com.kevin.healthtracker.datamodels.dto.StatusDTO;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.util.HashMap;
-
 
 public class WebClient {
     private String url;
@@ -78,7 +76,7 @@ public class WebClient {
     }
 
     public void increaseScore(int user, int score) {
-        restTemplate.put(String.format("%s/userscore/%s/%s", url, user, score), null);
+        restTemplate.put(String.format("%s/users/userscore/%s/%s", url, user, score), "");
     }
 
     /**
