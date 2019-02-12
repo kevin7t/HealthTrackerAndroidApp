@@ -20,6 +20,10 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.jjoe64.graphview.GraphView;
+import com.jjoe64.graphview.series.DataPoint;
+import com.jjoe64.graphview.series.LineGraphSeries;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -56,6 +60,8 @@ public class UserProgressFragment extends Fragment {
     private TextView goalCaloriesTextView, consumedCaloriesTextView, burntCaloriesTextView, netCaloriesTextView;
     private ExecutorService executor;
 
+    private GraphView weightGraph;
+
     private UserCalorieProfile userCalorieProfile;
     private DailyCalories dailyCalories;
     private Weight weight;
@@ -85,6 +91,8 @@ public class UserProgressFragment extends Fragment {
         increaseBurntCalories.setOnClickListener(increaseBurntCaloriesListener);
         decreaseBurntCalories.setOnClickListener(decreaseBurntCaloriesListener);
         weightEditText.setOnEditorActionListener(weightListener);
+
+        weightGraph = view.findViewById(R.id.weightGraph);
 
         executor = Executors.newFixedThreadPool(4);
         prefs = MainActivity.prefs;
@@ -153,7 +161,8 @@ public class UserProgressFragment extends Fragment {
         burntCaloriesTextView.setText(burntCalories.toString());
         burntCaloriesEditText.setText(burntCalories.toString());
         netCaloriesTextView.setText(netCalories.toString());
-        weightEditText.setText(weight.getWeight().toString() + "kg");
+        weightEditText.setText(weight.getWeight().toString());
+        weightGraph.addSeries(getWeightGraph());
     }
 
     private TextView.OnEditorActionListener weightListener = new TextView.OnEditorActionListener() {
@@ -283,6 +292,26 @@ public class UserProgressFragment extends Fragment {
         } else {
             return weight;
         }
+    }
+
+    private LineGraphSeries<DataPoint> getWeightGraph(){
+        LineGraphSeries<DataPoint> lineGraphSeries = new LineGraphSeries<>();
+        List<Weight> weightList = getAllWeightFromDB();
+        SimpleDateFormat formatter = new SimpleDateFormat(
+                "EEE MMM dd HH:mm:ss zzz yyyyy");
+        //TODO reduce this to month number
+
+        for (int i = 0; i< weightList.size(); i++){
+            Date date= null;
+            try {
+                date = formatter.parse(weightList.get(i).getDate());
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            lineGraphSeries.appendData(new DataPoint(date,weightList.get(i).getWeight().doubleValue()),true,256);
+        }
+
+        return lineGraphSeries;
     }
 
     private DailyCalories getTodaysCalories() throws ParseException {
