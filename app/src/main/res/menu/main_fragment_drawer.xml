@@ -5,10 +5,10 @@
 
     <group android:checkableBehavior="single">
         <item
-            android:id="@+id/fragment2"
+            android:id="@+id/fragment_achievements"
             android:checkable="true"
             android:icon="@drawable/ic_activity_tracker"
-            android:title="My Activity" />
+            android:title="My Achievements" />
         <item
             android:id="@+id/fragment_home"
             android:checkable="true"

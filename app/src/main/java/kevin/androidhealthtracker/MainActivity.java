@@ -24,6 +24,8 @@ import org.springframework.web.client.RestTemplate;
 
 import kevin.androidhealthtracker.fragments.FragmentTwo;
 import kevin.androidhealthtracker.fragments.LogoutFragment;
+import kevin.androidhealthtracker.fragments.MyAchievementsFragment;
+import kevin.androidhealthtracker.fragments.MyAchievementsFragment;
 import kevin.androidhealthtracker.fragments.ProfileFeedFragment;
 import kevin.androidhealthtracker.fragments.UserFeedFragment;
 import kevin.androidhealthtracker.fragments.UserProgressFragment;
@@ -100,8 +102,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 setTitle(R.string.title_activity_activity_feed);
                 fragmentClass = UserFeedFragment.class;
                 toolbar.setTitle("Home Feed");
-            } else if (id == R.id.fragment2) {
-                fragmentClass = FragmentTwo.class;
+            } else if (id == R.id.fragment_achievements) {
+                fragmentClass = MyAchievementsFragment.class;
             } else if (id == R.id.fragment_progress) {
                 fragmentClass = UserProgressFragment.class;
                 toolbar.setTitle("Progress");

@@ -12,7 +12,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.Toast;
@@ -40,7 +39,6 @@ public class FriendListActivity extends AppCompatActivity {
     private BottomNavigationView bottomNavigationView;
     private SearchView searchView;
     private ListView friendListView;
-    private List<Friend> friendsList;
     private WebClient client;
     private SharedPreferences prefs;
 
@@ -49,10 +47,6 @@ public class FriendListActivity extends AppCompatActivity {
 
     private Boolean searchViewActivated = false;
 
-    private ArrayAdapter<String> arrayAdapter;
-
-    private Map<Integer, User> outgoingFriends = new HashMap<>();
-    private Map<Integer, User> incomingFriends = new HashMap<>();
     private Map<Integer, User> searchFriends = new HashMap<>();
 
 
@@ -322,15 +316,6 @@ public class FriendListActivity extends AppCompatActivity {
                 friendListView.setAdapter(friendsListAdapter);
             }
         }
-    }
-
-    public static <K, V> K getKey(Map<K, V> map, V value) {
-        for (Map.Entry<K, V> entry : map.entrySet()) {
-            if (value.equals(entry.getValue())) {
-                return entry.getKey();
-            }
-        }
-        return null;
     }
 
 }
