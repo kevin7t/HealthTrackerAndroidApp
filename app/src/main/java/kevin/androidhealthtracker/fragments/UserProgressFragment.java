@@ -21,11 +21,15 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.jjoe64.graphview.GraphView;
+import com.jjoe64.graphview.LabelFormatter;
+import com.jjoe64.graphview.Viewport;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -117,7 +121,7 @@ public class UserProgressFragment extends Fragment {
         if (userCalorieProfile == null) {
             Intent userSetupIntent = new Intent(getActivity(), InputUserHealthDataActivity.class);
             startActivityForResult(userSetupIntent, USER_DATA_REQUEST_CODE);
-        }else {
+        } else {
             /**
              * Get calories from DB
              */
@@ -137,7 +141,6 @@ public class UserProgressFragment extends Fragment {
             }
             refreshProgress();
         }
-
 
 
         //TODO: save weight to database and retrieve them on activity creation
@@ -163,6 +166,7 @@ public class UserProgressFragment extends Fragment {
         netCaloriesTextView.setText(netCalories.toString());
         weightEditText.setText(weight.getWeight().toString());
         weightGraph.addSeries(getWeightGraph());
+        setMinMaxAxis();
     }
 
     private TextView.OnEditorActionListener weightListener = new TextView.OnEditorActionListener() {
@@ -294,21 +298,19 @@ public class UserProgressFragment extends Fragment {
         }
     }
 
-    private LineGraphSeries<DataPoint> getWeightGraph(){
+    private LineGraphSeries<DataPoint> getWeightGraph() {
         LineGraphSeries<DataPoint> lineGraphSeries = new LineGraphSeries<>();
         List<Weight> weightList = getAllWeightFromDB();
-        SimpleDateFormat formatter = new SimpleDateFormat(
-                "EEE MMM dd HH:mm:ss zzz yyyyy");
-        //TODO reduce this to month number
-
-        for (int i = 0; i< weightList.size(); i++){
-            Date date= null;
-            try {
-                date = formatter.parse(weightList.get(i).getDate());
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
-            lineGraphSeries.appendData(new DataPoint(date,weightList.get(i).getWeight().doubleValue()),true,256);
+//        SimpleDateFormat formatter = new SimpleDateFormat(
+//                "EEE MMM dd HH:mm:ss zzz yyyyy");
+        for (int i = 0; i < weightList.size(); i++) {
+//            Date date = null;
+//            try {
+//                date = formatter.parse(weightList.get(i).getDate());
+//            } catch (ParseException e) {
+//                e.printStackTrace();
+//            }
+            lineGraphSeries.appendData(new DataPoint(i, weightList.get(i).getWeight().doubleValue()), true, 40);
         }
 
         return lineGraphSeries;
@@ -328,5 +330,28 @@ public class UserProgressFragment extends Fragment {
         return healthTrackerDatabase.userCalorieProfileDAO().getLatest();
     }
 
+    private void setMinMaxAxis() {
+        List<Weight> weightList = getAllWeightFromDB();
+        List<Float> weights = new ArrayList<>();
+        weightList.forEach(w -> weights.add(w.getWeight()));
+        weightGraph.getViewport().setMaxY(Collections.max(weights));
+        weightGraph.getViewport().setMinY(Collections.min(weights));
+        weightGraph.getViewport().setYAxisBoundsManual(true);
+        weightGraph.getViewport().setMaxX(weightList.size());
+        weightGraph.getViewport().setMinX(1);
+        weightGraph.getGridLabelRenderer().setHumanRounding(false);
+        weightGraph.getGridLabelRenderer().setPadding(60);
+        weightGraph.getGridLabelRenderer().setLabelFormatter(new LabelFormatter() {
+            @Override
+            public String formatLabel(double value, boolean isValueX) {
+                return String.valueOf((int) value);
+            }
+
+            @Override
+            public void setViewport(Viewport viewport) {
+
+            }
+        });
+    }
 }
 
