@@ -11,6 +11,8 @@ import android.widget.ListView;
 
 import com.kevin.healthtracker.datamodels.User;
 
+import org.springframework.web.client.ResourceAccessException;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -51,7 +53,7 @@ public class MyAchievementsFragment extends Fragment {
             try {
                 user = client.getUser(prefs.getInt("userId", 0));
             }
-            catch (Exception e) {
+            catch (ResourceAccessException e) {
                 e.printStackTrace();
             }
             return user;
@@ -68,7 +70,7 @@ public class MyAchievementsFragment extends Fragment {
         List<String> achievements = new ArrayList<>();
         try {
             achievements = createListOfAchievements(user.getScore());
-        } catch (IOException e) {
+        } catch (IOException | NullPointerException e) {
             e.printStackTrace();
         }
         ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity().getApplicationContext(), R.layout.list_item, achievements);

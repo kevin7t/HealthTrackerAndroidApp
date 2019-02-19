@@ -35,8 +35,12 @@ public class FriendsListAdapter extends ArrayAdapter<User> {
         TextView userNameTextView = convertView.findViewById(R.id.userNameFriendTextView);
         TextView userScoreTextView = convertView.findViewById(R.id.userScoreTextView);
 
-        userNameTextView.setText(userList.get(position).getUserName());
-        userScoreTextView.setText(String.valueOf(userList.get(position).getScore()));
+        try{
+            userNameTextView.setText(userList.get(position).getUserName());
+            userScoreTextView.setText(String.valueOf(userList.get(position).getScore()));
+        }catch (NullPointerException e){
+            e.printStackTrace();
+        }
         return convertView;
     }
 }

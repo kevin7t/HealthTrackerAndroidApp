@@ -207,8 +207,7 @@ public class FriendListActivity extends AppCompatActivity {
 //                userNames = Arrays.asList(client.getAllFriends(userId)).stream().map(user -> user.getUserName()).collect(Collectors.toList());
                 users = Arrays.asList(client.getAllFriends(userId));
             } catch (RestClientException e) {
-                Toast error = new Toast(FriendListActivity.this);
-                Toast.makeText(FriendListActivity.this, e.toString(), Toast.LENGTH_LONG).show();
+                e.printStackTrace();
             }
             return true;
         }
@@ -241,8 +240,7 @@ public class FriendListActivity extends AppCompatActivity {
                 }
 
             } catch (RestClientException e) {
-                Toast error = new Toast(FriendListActivity.this);
-                Toast.makeText(FriendListActivity.this, e.toString(), Toast.LENGTH_LONG).show();
+                e.printStackTrace();
             }
             return true;
         }
@@ -273,8 +271,7 @@ public class FriendListActivity extends AppCompatActivity {
                 }
 
             } catch (RestClientException e) {
-                Toast error = new Toast(FriendListActivity.this);
-                Toast.makeText(FriendListActivity.this, e.toString(), Toast.LENGTH_LONG).show();
+                e.printStackTrace();
             }
             return true;
         }
@@ -302,9 +299,7 @@ public class FriendListActivity extends AppCompatActivity {
                 user = client.getUserByUserName(userName);
                 searchFriends.put(user.getId(), user);
             } catch (RestClientException e) {
-                //Cannot call toast on thread that has not called looper prepare
-//                Toast error = new Toast(FriendListActivity.this);
-//                Toast.makeText(FriendListActivity.this, e.toString(), Toast.LENGTH_LONG).show();
+                e.printStackTrace();
             }
             return true;
         }
