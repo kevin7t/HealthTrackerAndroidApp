@@ -11,6 +11,7 @@
     <string name="incoming_requests">Incoming Requests</string>
     <string name="outgoing_requests">Outgoing Requests</string>
     <string name="search_friend">Search</string>
+    <string name="Schedule">Schedule</string>
 
 
     <string name="navigation_drawer_open">Open navigation drawer</string>

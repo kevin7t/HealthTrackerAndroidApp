@@ -237,6 +237,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             case R.id.profileMenuItem:
                 loadProfileFragment();
                 break;
+            case R.id.scheduleMenuItem:
+                Intent scheduleActivityIntent = new Intent(MainActivity.this, ScheduleActivity.class);
+                startActivity(scheduleActivityIntent);
+                break;
         }
         drawer.closeDrawer(GravityCompat.START);
         return true;
