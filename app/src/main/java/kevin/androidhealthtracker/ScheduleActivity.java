@@ -13,10 +13,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.SearchView;
 import android.widget.Toast;
 
 import com.kevin.healthtracker.datamodels.Friend;
+import com.kevin.healthtracker.datamodels.Schedule;
 import com.kevin.healthtracker.datamodels.User;
 
 import org.springframework.web.client.RestClientException;
@@ -25,10 +25,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 import kevin.androidhealthtracker.adapters.FriendsListAdapter;
 import kevin.androidhealthtracker.fragments.AddFriendFragment;
@@ -37,15 +35,12 @@ import kevin.androidhealthtracker.fragments.RespondFriendFragment;
 
 public class ScheduleActivity extends AppCompatActivity {
     private BottomNavigationView bottomNavigationView;
-    private ListView friendListView;
+    private ListView scheduleListView;
     private WebClient client;
     private SharedPreferences prefs;
 
     private int userId;
     private String userName;
-
-
-    private Map<Integer, User> searchFriends = new HashMap<>();
 
 
     @Override
@@ -60,30 +55,30 @@ public class ScheduleActivity extends AppCompatActivity {
         userId = prefs.getInt("userId", 0);
         userName = prefs.getString("userName", null);
 
-        bottomNavigationView = findViewById(R.id.friendlist_bottom_navigation);
-        bottomNavigationView.setSelectedItemId(R.id.myFriendsItem);
+        bottomNavigationView = findViewById(R.id.scheduleList_bottom_navigation);
+        bottomNavigationView.setSelectedItemId(R.id.scheduleItem);
         bottomNavigationView.setOnNavigationItemSelectedListener(navigationItemSelectedListener);
 
-        friendListView = findViewById(R.id.friendsListview);
-        friendListView.setOnItemClickListener(friendListOnItemClickListener);
-        populateListFriends();
+        scheduleListView = findViewById(R.id.scheduleListView);
+        scheduleListView.setOnItemClickListener(ListViewOnItemClickListener);
+        populateListSchedule();
     }
 
-    private void populateListFriends() {
-        GetAllFriendsTask getAllFriendsTask = new GetAllFriendsTask();
-        getAllFriendsTask.execute();
-        setTitle(R.string.my_friends);
+    private void populateListSchedule() {
+        GetAllSchedules getAllSchedules = new GetAllSchedules();
+        getAllSchedules.execute();
+        setTitle(R.string.Schedule);
     }
 
     private void populateListIncoming() {
-        GetIncomingFriends getIncomingFriends = new GetIncomingFriends();
-        getIncomingFriends.execute();
+        GetIncoming getIncoming = new GetIncoming();
+        getIncoming.execute();
         setTitle(R.string.incoming_requests);
     }
 
     private void populateListOutgoing() {
-        GetOutgoingFriends getOutgoingFriends = new GetOutgoingFriends();
-        getOutgoingFriends.execute();
+        GetOutgoing getOutgoing = new GetOutgoing();
+        getOutgoing.execute();
         setTitle(R.string.outgoing_requests);
     }
 
@@ -98,18 +93,6 @@ public class ScheduleActivity extends AppCompatActivity {
         respondFriendFragment.setArguments(args);
     }
 
-    private void showAddDialog(int user1, int user2) {
-        Bundle args = new Bundle();
-        args.putInt("user1", user1);
-        args.putInt("user2", user2);
-
-        FragmentManager fragmentManager = getFragmentManager();
-        AddFriendFragment addFriendFragment = new AddFriendFragment();
-        addFriendFragment.show(fragmentManager, "add");
-
-        addFriendFragment.setArguments(args);
-    }
-
     private void showDeleteDialog(int user1, int user2) {
         Bundle args = new Bundle();
         args.putInt("user1", user1);
@@ -122,7 +105,7 @@ public class ScheduleActivity extends AppCompatActivity {
         deleteFriendFragment.setArguments(args);
     }
 
-    private ListView.OnItemClickListener friendListOnItemClickListener = new ListView.OnItemClickListener() {
+    private ListView.OnItemClickListener ListViewOnItemClickListener = new ListView.OnItemClickListener() {
         @Override
         public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
             if (bottomNavigationView.getSelectedItemId() == R.id.incomingFriendsItem) {
@@ -137,46 +120,6 @@ public class ScheduleActivity extends AppCompatActivity {
         }
     };
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_friend_list, menu);
-        MenuItem search = menu.findItem(R.id.action_search);
-        SearchView searchView = (SearchView) search.getActionView();
-        searchView.setOnQueryTextListener(onQueryTextListener);
-        searchView.setOnCloseListener(onCloseListener);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        return super.onOptionsItemSelected(item);
-    }
-
-    private SearchView.OnCloseListener onCloseListener = new SearchView.OnCloseListener() {
-        @Override
-        public boolean onClose() {
-            System.out.println("SEARCHVIEW CLOSED ");
-            searchViewActivated = false;
-            return false;
-        }
-    };
-
-    private SearchView.OnQueryTextListener onQueryTextListener = new SearchView.OnQueryTextListener() {
-        @Override
-        public boolean onQueryTextSubmit(String query) {
-            GetUserByName getUserByName = new GetUserByName(query);
-            getUserByName.execute();
-            setTitle(R.string.search_friend);
-            searchViewActivated = true;
-            return true;
-        }
-
-        @Override
-        public boolean onQueryTextChange(String newText) {
-            return false;
-        }
-    };
-
     @NonNull
     private BottomNavigationView.OnNavigationItemSelectedListener navigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -184,25 +127,24 @@ public class ScheduleActivity extends AppCompatActivity {
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
             // Handle navigation view item clicks here.
             int id = item.getItemId();
-            if (id == R.id.myFriendsItem) {
-                populateListFriends();
-            } else if (id == R.id.incomingFriendsItem) {
+            if (id == R.id.scheduleItem) {
+                populateListSchedule();
+            } else if (id == R.id.incomingScheduleItem) {
                 populateListIncoming();
-            } else if (id == R.id.outgoingFriendsItem) {
+            } else if (id == R.id.outgoingScheduleItem) {
                 populateListOutgoing();
             }
             return true;
         }
     };
 
-    public class GetAllFriendsTask extends AsyncTask<Void, Void, Boolean> {
-        List<User> users = new ArrayList<>();
+    public class GetAllSchedules extends AsyncTask<Void, Void, Boolean> {
+        List<Schedule> schedules = new ArrayList<>();
 
         @Override
         protected Boolean doInBackground(Void... voids) {
             try {
-//                userNames = Arrays.asList(client.getAllFriends(userId)).stream().map(user -> user.getUserName()).collect(Collectors.toList());
-                users = Arrays.asList(client.getAllFriends(userId));
+                schedules = Arrays.asList(client.getAllSchedule(userId));
             } catch (RestClientException e) {
                 Toast error = new Toast(ScheduleActivity.this);
                 Toast.makeText(ScheduleActivity.this, e.toString(), Toast.LENGTH_LONG).show();
@@ -213,33 +155,22 @@ public class ScheduleActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(final Boolean success) {
             if (success) {
-                Collections.sort(users, Comparator.comparing(User::getScore).reversed());
-                FriendsListAdapter friendsListAdapter = new FriendsListAdapter(getApplicationContext(), users);
-                friendListView.setAdapter(friendsListAdapter);
+                FriendsListAdapter friendsListAdapter = new FriendsListAdapter(getApplicationContext(), sch);
+                scheduleListView.setAdapter(friendsListAdapter);
             }
         }
     }
 
-    public class GetIncomingFriends extends AsyncTask<Void, Void, Boolean> {
-        List<User> users = new ArrayList<>();
+    public class GetIncoming extends AsyncTask<Void, Void, Boolean> {
+        List<Schedule> schedules = new ArrayList<>();
 
         @Override
         protected Boolean doInBackground(Void... voids) {
             try {
-                List<Friend> friends = Arrays.asList(client.getInboundOutboundRequests(userId));
-                Iterator iterator = friends.iterator();
-                while (iterator.hasNext()) {
-                    Friend friend = (Friend) iterator.next();
-                    if (friend.getUserActionId() != userId && friend.getUser1().getId() != userId) {
-                        users.add(friend.getUser1());
-                    } else if (friend.getUserActionId() != userId && friend.getUser2().getId() != userId) {
-                        users.add(friend.getUser2());
-                    }
-                }
+                schedules = Arrays.asList(client.getInboundSchedule(userId));
 
             } catch (RestClientException e) {
-                Toast error = new Toast(ScheduleActivity.this);
-                Toast.makeText(ScheduleActivity.this, e.toString(), Toast.LENGTH_LONG).show();
+                e.printStackTrace();
             }
             return true;
         }
@@ -248,30 +179,20 @@ public class ScheduleActivity extends AppCompatActivity {
         protected void onPostExecute(final Boolean success) {
             if (success) {
                 FriendsListAdapter friendsListAdapter = new FriendsListAdapter(getApplicationContext(), users);
-                friendListView.setAdapter(friendsListAdapter);
+                scheduleListView.setAdapter(friendsListAdapter);
             }
         }
     }
 
-    public class GetOutgoingFriends extends AsyncTask<Void, Void, Boolean> {
-        List<User> users = new ArrayList<>();
+    public class GetOutgoing extends AsyncTask<Void, Void, Boolean> {
+        List<Schedule> schedules = new ArrayList<>();
         @Override
         protected Boolean doInBackground(Void... voids) {
             try {
-                List<Friend> friends = Arrays.asList(client.getInboundOutboundRequests(userId));
-                Iterator iterator = friends.iterator();
-                while (iterator.hasNext()) {
-                    Friend friend = (Friend) iterator.next();
-                    if (friend.getUserActionId() == userId && friend.getUser1().getId() != userId) {
-                        users.add(friend.getUser1());
-                    } else if (friend.getUserActionId() == userId && friend.getUser2().getId() != userId) {
-                        users.add(friend.getUser2());
-                    }
-                }
+                schedules = Arrays.asList(client.getOutboundSchedule(userId));
 
             } catch (RestClientException e) {
-                Toast error = new Toast(ScheduleActivity.this);
-                Toast.makeText(ScheduleActivity.this, e.toString(), Toast.LENGTH_LONG).show();
+                e.printStackTrace();
             }
             return true;
         }
@@ -280,37 +201,7 @@ public class ScheduleActivity extends AppCompatActivity {
         protected void onPostExecute(final Boolean success) {
             if (success) {
                 FriendsListAdapter friendsListAdapter = new FriendsListAdapter(getApplicationContext(), users);
-                friendListView.setAdapter(friendsListAdapter);
-            }
-        }
-    }
-
-    public class GetUserByName extends AsyncTask<Void, Void, Boolean> {
-        String userName;
-        User user;
-
-        GetUserByName(String userName) {
-            this.userName = userName;
-        }
-
-        @Override
-        protected Boolean doInBackground(Void... voids) {
-            try {
-                user = client.getUserByUserName(userName);
-                searchFriends.put(user.getId(), user);
-            } catch (RestClientException e) {
-                //Cannot call toast on thread that has not called looper prepare
-//                Toast error = new Toast(FriendListActivity.this);
-//                Toast.makeText(FriendListActivity.this, e.toString(), Toast.LENGTH_LONG).show();
-            }
-            return true;
-        }
-
-        @Override
-        protected void onPostExecute(final Boolean success) {
-            if (success) {
-                FriendsListAdapter friendsListAdapter = new FriendsListAdapter(getApplicationContext(), Collections.singletonList(user));
-                friendListView.setAdapter(friendsListAdapter);
+                scheduleListView.setAdapter(friendsListAdapter);
             }
         }
     }

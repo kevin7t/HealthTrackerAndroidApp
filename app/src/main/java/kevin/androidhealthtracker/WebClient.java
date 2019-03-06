@@ -1,13 +1,17 @@
 package kevin.androidhealthtracker;
 
 import com.kevin.healthtracker.datamodels.Friend;
+import com.kevin.healthtracker.datamodels.Schedule;
 import com.kevin.healthtracker.datamodels.User;
 import com.kevin.healthtracker.datamodels.dto.LikeDTO;
 import com.kevin.healthtracker.datamodels.dto.ReplyDTO;
+import com.kevin.healthtracker.datamodels.dto.ScheduleDTO;
 import com.kevin.healthtracker.datamodels.dto.StatusDTO;
 
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
+
+import java.util.List;
 
 
 public class WebClient {
@@ -123,4 +127,27 @@ public class WebClient {
         restTemplate.delete(url + "/feed/status/reply/" + replyId);
     }
 
+    public Schedule addSchedule(ScheduleDTO scheduleDTO) {
+        return restTemplate.postForObject(url + "/schedule/add", scheduleDTO, Schedule.class);
+    }
+
+    public Schedule acceptSchedule(int scheduleId) {
+        return restTemplate.postForObject(url + "/schedule/accept/"+scheduleId,null, Schedule.class);
+    }
+
+    public Schedule declineSchedule(int scheduleId) {
+        return restTemplate.postForObject(url + "/schedule/decline/"+scheduleId,null, Schedule.class);
+    }
+
+    public Schedule[] getAllSchedule(int userId){
+        return restTemplate.getForObject(url + "/schedule/getAll/"+userId, Schedule[].class);
+    }
+
+    public Schedule[] getInboundSchedule(int userId){
+        return restTemplate.getForObject(url + "/schedule/getInbound/"+userId, Schedule[].class);
+    }
+
+    public Schedule[] getOutboundSchedule(int userId){
+        return restTemplate.getForObject(url + "/schedule/getOutbound/"+userId, Schedule[].class);
+    }
 }
