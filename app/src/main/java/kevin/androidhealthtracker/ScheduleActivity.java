@@ -8,14 +8,11 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.Toast;
 
-import com.kevin.healthtracker.datamodels.Friend;
 import com.kevin.healthtracker.datamodels.Schedule;
 import com.kevin.healthtracker.datamodels.User;
 
@@ -23,15 +20,12 @@ import org.springframework.web.client.RestClientException;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Iterator;
 import java.util.List;
 
-import kevin.androidhealthtracker.adapters.FriendsListAdapter;
-import kevin.androidhealthtracker.fragments.AddFriendFragment;
+import kevin.androidhealthtracker.adapters.ScheduleListAdapter;
 import kevin.androidhealthtracker.fragments.DeleteFriendFragment;
 import kevin.androidhealthtracker.fragments.RespondFriendFragment;
+import kevin.androidhealthtracker.fragments.RespondScheduleFragment;
 
 public class ScheduleActivity extends AppCompatActivity {
     private BottomNavigationView bottomNavigationView;
@@ -46,8 +40,7 @@ public class ScheduleActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //TODO create layout
-        setContentView(R.layout.activity_friend_list);
+        setContentView(R.layout.activity_schedule_list);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         client = MainActivity.client;
@@ -60,7 +53,7 @@ public class ScheduleActivity extends AppCompatActivity {
         bottomNavigationView.setOnNavigationItemSelectedListener(navigationItemSelectedListener);
 
         scheduleListView = findViewById(R.id.scheduleListView);
-        scheduleListView.setOnItemClickListener(ListViewOnItemClickListener);
+        scheduleListView.setOnItemClickListener(listViewOnItemClickListener);
         populateListSchedule();
     }
 
@@ -82,40 +75,23 @@ public class ScheduleActivity extends AppCompatActivity {
         setTitle(R.string.outgoing_requests);
     }
 
-    private void showRespondDialog(int user1, int user2) {
+    private void showRespondDialog(int scheduleId) {
         Bundle args = new Bundle();
-        args.putInt("user1", user1);
-        args.putInt("user2", user2);
+        args.putInt("scheduleId", scheduleId);
 
         FragmentManager fragmentManager = getFragmentManager();
-        RespondFriendFragment respondFriendFragment = new RespondFriendFragment();
-        respondFriendFragment.show(fragmentManager, "respond");
-        respondFriendFragment.setArguments(args);
+        RespondScheduleFragment respondScheduleFragment = new RespondScheduleFragment();
+        respondScheduleFragment.show(fragmentManager, "respond");
+        respondScheduleFragment.setArguments(args);
     }
 
-    private void showDeleteDialog(int user1, int user2) {
-        Bundle args = new Bundle();
-        args.putInt("user1", user1);
-        args.putInt("user2", user2);
-
-        FragmentManager fragmentManager = getFragmentManager();
-        DeleteFriendFragment deleteFriendFragment = new DeleteFriendFragment();
-        deleteFriendFragment.show(fragmentManager, "delete");
-
-        deleteFriendFragment.setArguments(args);
-    }
-
-    private ListView.OnItemClickListener ListViewOnItemClickListener = new ListView.OnItemClickListener() {
+    private ListView.OnItemClickListener listViewOnItemClickListener = new ListView.OnItemClickListener() {
         @Override
         public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-            if (bottomNavigationView.getSelectedItemId() == R.id.incomingFriendsItem) {
-                User user = (User) adapterView.getItemAtPosition(i);
-                showRespondDialog(userId, user.getId());
+            Schedule schedule = (Schedule) adapterView.getItemAtPosition(i);
+            if (bottomNavigationView.getSelectedItemId() == R.id.incomingScheduleItem) {
+                showRespondDialog(schedule.getId());
                 populateListIncoming();
-            }
-            else if (bottomNavigationView.getSelectedItemId() == R.id.myFriendsItem) {
-                User user = (User) adapterView.getItemAtPosition(i);
-                showDeleteDialog(userId, user.getId());
             }
         }
     };
@@ -146,8 +122,7 @@ public class ScheduleActivity extends AppCompatActivity {
             try {
                 schedules = Arrays.asList(client.getAllSchedule(userId));
             } catch (RestClientException e) {
-                Toast error = new Toast(ScheduleActivity.this);
-                Toast.makeText(ScheduleActivity.this, e.toString(), Toast.LENGTH_LONG).show();
+                e.printStackTrace();
             }
             return true;
         }
@@ -155,8 +130,8 @@ public class ScheduleActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(final Boolean success) {
             if (success) {
-                FriendsListAdapter friendsListAdapter = new FriendsListAdapter(getApplicationContext(), sch);
-                scheduleListView.setAdapter(friendsListAdapter);
+                ScheduleListAdapter scheduleListAdapter = new ScheduleListAdapter(getApplicationContext(), schedules);
+                scheduleListView.setAdapter(scheduleListAdapter);
             }
         }
     }
@@ -178,8 +153,8 @@ public class ScheduleActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(final Boolean success) {
             if (success) {
-                FriendsListAdapter friendsListAdapter = new FriendsListAdapter(getApplicationContext(), users);
-                scheduleListView.setAdapter(friendsListAdapter);
+                ScheduleListAdapter scheduleListAdapter = new ScheduleListAdapter(getApplicationContext(), schedules);
+                scheduleListView.setAdapter(scheduleListAdapter);
             }
         }
     }
@@ -200,8 +175,8 @@ public class ScheduleActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(final Boolean success) {
             if (success) {
-                FriendsListAdapter friendsListAdapter = new FriendsListAdapter(getApplicationContext(), users);
-                scheduleListView.setAdapter(friendsListAdapter);
+                ScheduleListAdapter scheduleListAdapter = new ScheduleListAdapter(getApplicationContext(), schedules);
+                scheduleListView.setAdapter(scheduleListAdapter);
             }
         }
     }

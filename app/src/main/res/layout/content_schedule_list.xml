@@ -48,7 +48,7 @@
             app:itemBackground="@color/colorWhite"
             app:itemIconTint="@drawable/selector_colors"
             app:itemTextColor="@drawable/selector_colors"
-            app:menu="@menu/Schedule_fragment_drawer" >
+            app:menu="@menu/schedule_fragment_drawer" >
 
         </android.support.design.widget.BottomNavigationView>
 

@@ -140,14 +140,14 @@ public class WebClient {
     }
 
     public Schedule[] getAllSchedule(int userId){
-        return restTemplate.getForObject(url + "/schedule/getAll/"+userId, Schedule[].class);
+        return restTemplate.getForObject(url + "/schedule/getall/"+userId, Schedule[].class);
     }
 
     public Schedule[] getInboundSchedule(int userId){
-        return restTemplate.getForObject(url + "/schedule/getInbound/"+userId, Schedule[].class);
+        return restTemplate.getForObject(url + "/schedule/getinbound/"+userId, Schedule[].class);
     }
 
     public Schedule[] getOutboundSchedule(int userId){
-        return restTemplate.getForObject(url + "/schedule/getOutbound/"+userId, Schedule[].class);
+        return restTemplate.getForObject(url + "/schedule/getoutbound/"+userId, Schedule[].class);
     }
 }

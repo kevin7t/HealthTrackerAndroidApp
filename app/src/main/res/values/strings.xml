@@ -54,6 +54,7 @@
         <item>Weights</item>
     </string-array>
     <string name="title_activity_friend_list">FriendListActivity</string>
+    <string name="title_activity_schedule">ScheduleActivity</string>
 
 
 
