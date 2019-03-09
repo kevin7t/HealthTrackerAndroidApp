@@ -31,12 +31,7 @@
         tools:showIn="@layout/content_main">
 
 
-        <ListView
-            android:id="@+id/friendsListview"
-            android:layout_width="match_parent"
-            android:layout_height="456dp"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentTop="true" />
+        <include layout="@layout/content_friends_list_view" />
 
         <android.support.design.widget.BottomNavigationView
             android:id="@+id/friendlist_bottom_navigation"

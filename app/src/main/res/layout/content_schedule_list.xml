@@ -48,9 +48,24 @@
             app:itemBackground="@color/colorWhite"
             app:itemIconTint="@drawable/selector_colors"
             app:itemTextColor="@drawable/selector_colors"
-            app:menu="@menu/schedule_fragment_drawer" >
+            app:menu="@menu/schedule_fragment_drawer">
 
         </android.support.design.widget.BottomNavigationView>
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/scheduleFab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/scheduleList_bottom_navigation"
+            android:layout_alignParentEnd="true"
+            android:layout_gravity="bottom|end"
+            android:layout_margin="16dp"
+            android:backgroundTint="@color/colorPrimary"
+            android:elevation="8dp"
+            android:tint="@color/colorWhite"
+            app:borderWidth="0dp"
+            app:fabSize="normal"
+            app:srcCompat="@drawable/ic_add_white_24dp" />
 
     </RelativeLayout>
 

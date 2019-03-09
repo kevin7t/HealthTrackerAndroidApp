@@ -1,11 +1,13 @@
 package kevin.androidhealthtracker;
 
 import android.app.FragmentManager;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
@@ -14,7 +16,6 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.kevin.healthtracker.datamodels.Schedule;
-import com.kevin.healthtracker.datamodels.User;
 
 import org.springframework.web.client.RestClientException;
 
@@ -23,8 +24,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import kevin.androidhealthtracker.adapters.ScheduleListAdapter;
-import kevin.androidhealthtracker.fragments.DeleteFriendFragment;
-import kevin.androidhealthtracker.fragments.RespondFriendFragment;
 import kevin.androidhealthtracker.fragments.RespondScheduleFragment;
 
 public class ScheduleActivity extends AppCompatActivity {
@@ -51,6 +50,9 @@ public class ScheduleActivity extends AppCompatActivity {
         bottomNavigationView = findViewById(R.id.scheduleList_bottom_navigation);
         bottomNavigationView.setSelectedItemId(R.id.scheduleItem);
         bottomNavigationView.setOnNavigationItemSelectedListener(navigationItemSelectedListener);
+
+        FloatingActionButton floatingActionButton = findViewById(R.id.scheduleFab);
+        floatingActionButton.setOnClickListener(fabListener);
 
         scheduleListView = findViewById(R.id.scheduleListView);
         scheduleListView.setOnItemClickListener(listViewOnItemClickListener);
@@ -84,6 +86,11 @@ public class ScheduleActivity extends AppCompatActivity {
         respondScheduleFragment.show(fragmentManager, "respond");
         respondScheduleFragment.setArguments(args);
     }
+
+    private FloatingActionButton.OnClickListener fabListener = view -> {
+        Intent createScheduleIntent = new Intent(ScheduleActivity.this, CreateScheduleActivity.class);
+        startActivity(createScheduleIntent);
+    };
 
     private ListView.OnItemClickListener listViewOnItemClickListener = new ListView.OnItemClickListener() {
         @Override

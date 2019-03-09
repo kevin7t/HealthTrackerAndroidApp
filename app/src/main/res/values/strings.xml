@@ -55,7 +55,9 @@
     </string-array>
     <string name="title_activity_friend_list">FriendListActivity</string>
     <string name="title_activity_schedule">ScheduleActivity</string>
-
+    <string name="title_activity_create_schedule">"Create schedule "</string>
+    <!-- Strings related to login -->
+    <string name="prompt_email">Email</string>
 
 
 </resources>
