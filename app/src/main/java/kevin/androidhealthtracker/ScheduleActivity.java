@@ -43,7 +43,7 @@ public class ScheduleActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         client = MainActivity.client;
-        prefs = MainActivity.prefs;
+        prefs = getSharedPreferences("SharedPreferences", MODE_PRIVATE);
         userId = prefs.getInt("userId", 0);
         userName = prefs.getString("userName", null);
 

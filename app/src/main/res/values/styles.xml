@@ -31,4 +31,9 @@
         <item name="android:textColor">@color/colorPrimaryText</item>
     </style>
 
+    <style name="MyPickerDialogTheme" parent="@style/Theme.AppCompat.Light.Dialog">
+        <item name="android:textColor">@color/colorPrimaryText</item>
+        <item name="colorAccent">@color/colorAccent</item>
+    </style>
+
 </resources>
