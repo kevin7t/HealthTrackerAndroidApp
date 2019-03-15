@@ -38,10 +38,12 @@ public class ScheduleListAdapter extends ArrayAdapter<Schedule> {
         TextView scheduleUser2 = convertView.findViewById(R.id.scheduleUserName2);
         TextView scheduleDate = convertView.findViewById(R.id.scheduleDateValue);
         TextView scheduleContent = convertView.findViewById(R.id.scheduleContentValue);
+        TextView scheduleStatus = convertView.findViewById(R.id.scheduleStatusTextviewValue);
         scheduleUser1.setText(scheduleList.get(position).getUser1().getUserName());
         scheduleUser2.setText(scheduleList.get(position).getUser2().getUserName());
         scheduleDate.setText(scheduleList.get(position).getDateTime().toString());
         scheduleContent.setText(scheduleList.get(position).getContent());
+        scheduleStatus.setText(scheduleList.get(position).getScheduleStatus().toString());
         return convertView;
     }
 }

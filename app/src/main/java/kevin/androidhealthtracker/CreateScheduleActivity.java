@@ -7,6 +7,8 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -15,8 +17,14 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.TimePicker;
+import android.widget.Toast;
 
+import com.kevin.healthtracker.datamodels.RequestStatus;
+import com.kevin.healthtracker.datamodels.Schedule;
 import com.kevin.healthtracker.datamodels.User;
+import com.kevin.healthtracker.datamodels.dto.ScheduleDTO;
+
+import org.springframework.web.client.RestClientException;
 
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
@@ -49,6 +57,9 @@ public class CreateScheduleActivity extends AppCompatActivity {
     private User selectedUser;
     private Calendar calendar;
     private Timestamp timestamp;
+    private String activityContent;
+
+    private ExecutorService executor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,7 +79,7 @@ public class CreateScheduleActivity extends AppCompatActivity {
 
         calendar = Calendar.getInstance();
 
-        ExecutorService executor = Executors.newWorkStealingPool();
+        executor = Executors.newWorkStealingPool();
         Callable<List<User>> task = () -> {
             List<User> friendList = null;
             try {
@@ -94,16 +105,64 @@ public class CreateScheduleActivity extends AppCompatActivity {
 
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.status_type, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(R.layout.spinner_dropdown_item);
-        activityTypeSpinner.setOnItemSelectedListener(spinnerListener);
+        activityTypeSpinner.setOnItemSelectedListener(activitySpinnerListener);
         activityTypeSpinner.setAdapter(adapter);
 
         dateTimeEditText.setOnClickListener(timeListener);
     }
+    
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_new_status, menu);
+        return true;
+    }
 
-    AdapterView.OnItemSelectedListener spinnerListener = new AdapterView.OnItemSelectedListener() {
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_post) {
+            try {
+                ScheduleDTO newSchedule = new ScheduleDTO();
+                newSchedule.setUser1id(userId);
+                newSchedule.setUser2id(selectedUser.getId());
+                newSchedule.setDateTime(timestamp);
+                newSchedule.setScheduleStatus(RequestStatus.PENDING);
+                newSchedule.setContent(activityContent);
+                newSchedule.setUserActionId(userId);
+                if (newSchedule.getUser2id() != 0 &&
+                    newSchedule.getDateTime() != null &&
+                    newSchedule.getScheduleStatus() != null &&
+                    newSchedule.getContent() != null){
+                    Callable<Schedule> task = () -> {
+                        Schedule schedule = null;
+                        try {
+                            schedule = client.addSchedule(newSchedule);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        return schedule;
+                    };
+                    executor.submit(task);
+                }
+
+            } catch (RestClientException e) {
+                e.printStackTrace();
+            }
+            Toast.makeText(this, "Schedule sent", Toast.LENGTH_LONG).show();
+            finish();
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    AdapterView.OnItemSelectedListener activitySpinnerListener = new AdapterView.OnItemSelectedListener() {
         @Override
         public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
             ((TextView) adapterView.getChildAt(0)).setTextColor(Color.BLACK);
+            activityContent = activityTypeSpinner.getSelectedItem().toString();
         }
 
         @Override
@@ -160,7 +219,6 @@ public class CreateScheduleActivity extends AppCompatActivity {
     };
 
 
-    //TODO Get friends from client, populate first spinner, get activities enum and populate second spinner like creating status, enable done button top right
 
 }
 

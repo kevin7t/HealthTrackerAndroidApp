@@ -15,10 +15,12 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
+import com.kevin.healthtracker.datamodels.RequestStatus;
 import com.kevin.healthtracker.datamodels.Schedule;
 
 import org.springframework.web.client.RestClientException;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -127,7 +129,12 @@ public class ScheduleActivity extends AppCompatActivity {
         @Override
         protected Boolean doInBackground(Void... voids) {
             try {
-                schedules = Arrays.asList(client.getAllSchedule(userId));
+                Arrays.asList(client.getAllSchedule(userId)).forEach(schedule -> {
+                    Timestamp currentTime = new Timestamp(System.currentTimeMillis());
+                    if (schedule.getScheduleStatus() == RequestStatus.PENDING && schedule.getDateTime().after(currentTime)) {
+                        schedules.add(schedule);
+                    }
+                });
             } catch (RestClientException e) {
                 e.printStackTrace();
             }
@@ -168,6 +175,7 @@ public class ScheduleActivity extends AppCompatActivity {
 
     public class GetOutgoing extends AsyncTask<Void, Void, Boolean> {
         List<Schedule> schedules = new ArrayList<>();
+
         @Override
         protected Boolean doInBackground(Void... voids) {
             try {
@@ -187,5 +195,6 @@ public class ScheduleActivity extends AppCompatActivity {
             }
         }
     }
+
 
 }
