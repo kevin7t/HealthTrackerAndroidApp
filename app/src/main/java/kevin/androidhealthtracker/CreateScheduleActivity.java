@@ -27,11 +27,8 @@ import com.kevin.healthtracker.datamodels.dto.ScheduleDTO;
 import org.springframework.web.client.RestClientException;
 
 import java.sql.Timestamp;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -163,7 +160,29 @@ public class CreateScheduleActivity extends AppCompatActivity {
         @Override
         public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
             ((TextView) adapterView.getChildAt(0)).setTextColor(Color.BLACK);
-            activityContent = activityTypeSpinner.getSelectedItem().toString();
+            switch ( activityTypeSpinner.getSelectedItem().toString()) {
+                case "Walk":
+                    activityContent = "Lets go on a walk!";
+                    break;
+                case "Run":
+                    activityContent = "Lets go on a run!";
+                    break;
+                case "Sprint":
+                    activityContent = "I challenge you to a sprint!";
+                    break;
+                case "Swim":
+                    activityContent = "Lets go swimming!";
+                    break;
+                case "Bike":
+                    activityContent = "Lets go on a bike ride!";
+                    break;
+                case "Row":
+                    activityContent = "Lets go rowing!";
+                    break;
+                case "Weights":
+                    activityContent = "Lets lift some weights!";
+                    break;
+            }
         }
 
         @Override
@@ -195,18 +214,7 @@ public class CreateScheduleActivity extends AppCompatActivity {
             @
                     Override
             public void onTimeSet(TimePicker timePicker, int hourOfDay, int minutes) {
-                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd-MM-yyyy HH:MM");
-//                String dateTimeString = dayOfMonth + "-" + monthOfYear + "-" + year + " " + hourOfDay + ":" + minutes;
-//
-//                Date date = null;
-//                try {
-//                    date = simpleDateFormat.parse(dateTimeString);
-//                } catch (ParseException e) {
-//                    e.printStackTrace();
-//                }
-
-//                calendar.setTime(date);
-                calendar.set(year,monthOfYear,dayOfMonth,hourOfDay,minutes);
+                calendar.set(year, monthOfYear, dayOfMonth, hourOfDay, minutes);
                 timestamp = new Timestamp(calendar.getTime().getTime());
                 dateTimeEditText.setText(timestamp.toString());
             }

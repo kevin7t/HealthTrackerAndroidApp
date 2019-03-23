@@ -61,6 +61,7 @@ public class StatusListAdapter extends ArrayAdapter<StatusDTO> {
                 profilePicture.setImageResource(R.drawable.ic_rowing);
                 break;
             case WEIGHT:
+                profilePicture.setImageResource(R.drawable.ic_weights);
                 break;
         }
         userNameTextView.setText(statusDTO.getUserName());
