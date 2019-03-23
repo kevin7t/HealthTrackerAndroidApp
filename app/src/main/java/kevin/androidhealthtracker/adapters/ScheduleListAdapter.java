@@ -55,7 +55,7 @@ public class ScheduleListAdapter extends ArrayAdapter<Schedule> {
             scheduleUser.setText(schedule.getUser1().getUserName() + " has invited you to workout");
         }
 
-        scheduleDate.setText(new SimpleDateFormat("MM/dd/yyyy HH:mm").format(scheduleList.get(position).getDateTime()));
+        scheduleDate.setText(new SimpleDateFormat("dd/MM/yyyy HH:mm").format(scheduleList.get(position).getDateTime()));
         scheduleContent.setText(scheduleList.get(position).getContent());
         scheduleStatus.setText(scheduleList.get(position).getScheduleStatus().toString());
         return convertView;
