@@ -36,7 +36,6 @@ public class StatusListAdapter extends ArrayAdapter<StatusDTO> {
         convertView = layoutInflater.inflate(R.layout.status_listview_item, null, true);
 
         ImageView profilePicture = convertView.findViewById(R.id.userProfilePicture);
-        //TODO Change profile picture depending on the status type
         TextView userNameTextView = convertView.findViewById(R.id.userNameTextView);
         TextView statusTextView = convertView.findViewById(R.id.statusContentTextView);
         TextView dateTimeTextView = convertView.findViewById(R.id.statusDateTimeView);
@@ -64,10 +63,10 @@ public class StatusListAdapter extends ArrayAdapter<StatusDTO> {
             case WEIGHT:
                 break;
         }
-        userNameTextView.setText("User: " + statusDTO.getUserName());
+        userNameTextView.setText(statusDTO.getUserName());
         Date date = statusDTO.getCreatedAt();
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
-        dateTimeTextView.setText(statusDTO.getType() + ": " + dateFormat.format(date));
+        dateTimeTextView.setText(dateFormat.format(date));
         statusTextView.setText( statusDTO.getContent());
         return convertView;
     }

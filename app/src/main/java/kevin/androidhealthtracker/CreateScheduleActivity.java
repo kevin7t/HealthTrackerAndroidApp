@@ -27,6 +27,7 @@ import com.kevin.healthtracker.datamodels.dto.ScheduleDTO;
 import org.springframework.web.client.RestClientException;
 
 import java.sql.Timestamp;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -110,7 +111,7 @@ public class CreateScheduleActivity extends AppCompatActivity {
 
         dateTimeEditText.setOnClickListener(timeListener);
     }
-    
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_new_status, menu);
@@ -132,9 +133,9 @@ public class CreateScheduleActivity extends AppCompatActivity {
                 newSchedule.setContent(activityContent);
                 newSchedule.setUserActionId(userId);
                 if (newSchedule.getUser2id() != 0 &&
-                    newSchedule.getDateTime() != null &&
-                    newSchedule.getScheduleStatus() != null &&
-                    newSchedule.getContent() != null){
+                        newSchedule.getDateTime() != null &&
+                        newSchedule.getScheduleStatus() != null &&
+                        newSchedule.getContent() != null) {
                     Callable<Schedule> task = () -> {
                         Schedule schedule = null;
                         try {
@@ -175,12 +176,12 @@ public class CreateScheduleActivity extends AppCompatActivity {
         @Override
         public void onClick(View viewOnClick) {
 
-            DatePickerDialog datePickerDialog = new DatePickerDialog(viewOnClick.getContext(),R.style.MyPickerDialogTheme,
+            DatePickerDialog datePickerDialog = new DatePickerDialog(viewOnClick.getContext(), R.style.MyPickerDialogTheme,
                     new DatePickerDialog.OnDateSetListener() {
 
                         @Override
                         public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-                            timePicker(viewOnClick);
+                            timePicker(viewOnClick, year, monthOfYear, dayOfMonth);
                         }
                     }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
             datePickerDialog.show();
@@ -189,16 +190,25 @@ public class CreateScheduleActivity extends AppCompatActivity {
     };
 
 
-
-    public void timePicker(View view) {
+    public void timePicker(View view, int year, int monthOfYear, int dayOfMonth) {
         TimePickerDialog timePickerDialog = new TimePickerDialog(view.getContext(), R.style.MyPickerDialogTheme, new TimePickerDialog.OnTimeSetListener() {
             @
                     Override
             public void onTimeSet(TimePicker timePicker, int hourOfDay, int minutes) {
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd-MM-yyyy HH:MM");
+//                String dateTimeString = dayOfMonth + "-" + monthOfYear + "-" + year + " " + hourOfDay + ":" + minutes;
+//
+//                Date date = null;
+//                try {
+//                    date = simpleDateFormat.parse(dateTimeString);
+//                } catch (ParseException e) {
+//                    e.printStackTrace();
+//                }
+
+//                calendar.setTime(date);
+                calendar.set(year,monthOfYear,dayOfMonth,hourOfDay,minutes);
                 timestamp = new Timestamp(calendar.getTime().getTime());
-                Date date = new Date();
-                date.setTime(timestamp.getTime());
-                dateTimeEditText.setText(new SimpleDateFormat("dd-MM-yyyy HH:MM").format(date));
+                dateTimeEditText.setText(timestamp.toString());
             }
         }, calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), true);
         timePickerDialog.show();
@@ -217,7 +227,6 @@ public class CreateScheduleActivity extends AppCompatActivity {
 
         }
     };
-
 
 
 }

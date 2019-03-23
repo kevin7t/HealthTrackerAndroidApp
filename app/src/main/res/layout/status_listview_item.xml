@@ -4,17 +4,17 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/colorWhite"
-    android:paddingBottom="20dp">
+    android:paddingBottom="10dp">
 
     <ImageButton
         android:id="@+id/userProfilePicture"
         android:layout_width="46dp"
         android:layout_height="47dp"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/background"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:background="@drawable/background"/>
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/userNameTextView"
@@ -23,7 +23,8 @@
         android:layout_marginStart="80dp"
         android:layout_marginTop="16dp"
         android:text="Username"
-        android:textColor="@color/colorPrimaryText"
+        android:textColor="@color/colorAccent"
+        android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 

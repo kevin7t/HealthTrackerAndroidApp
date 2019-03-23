@@ -131,7 +131,7 @@ public class ScheduleActivity extends AppCompatActivity {
             try {
                 Arrays.asList(client.getAllSchedule(userId)).forEach(schedule -> {
                     Timestamp currentTime = new Timestamp(System.currentTimeMillis());
-                    if (schedule.getScheduleStatus() == RequestStatus.PENDING && schedule.getDateTime().after(currentTime)) {
+                    if (schedule.getDateTime().after(currentTime)) {
                         schedules.add(schedule);
                     }
                 });
@@ -144,7 +144,7 @@ public class ScheduleActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(final Boolean success) {
             if (success) {
-                ScheduleListAdapter scheduleListAdapter = new ScheduleListAdapter(getApplicationContext(), schedules);
+                ScheduleListAdapter scheduleListAdapter = new ScheduleListAdapter(getApplicationContext(), schedules, userId);
                 scheduleListView.setAdapter(scheduleListAdapter);
             }
         }
@@ -156,7 +156,12 @@ public class ScheduleActivity extends AppCompatActivity {
         @Override
         protected Boolean doInBackground(Void... voids) {
             try {
-                schedules = Arrays.asList(client.getInboundSchedule(userId));
+                Arrays.asList(client.getInboundSchedule(userId)).forEach(schedule -> {
+                    Timestamp currentTime = new Timestamp(System.currentTimeMillis());
+                    if (schedule.getDateTime().after(currentTime)) {
+                        schedules.add(schedule);
+                    }
+                });
 
             } catch (RestClientException e) {
                 e.printStackTrace();
@@ -167,7 +172,7 @@ public class ScheduleActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(final Boolean success) {
             if (success) {
-                ScheduleListAdapter scheduleListAdapter = new ScheduleListAdapter(getApplicationContext(), schedules);
+                ScheduleListAdapter scheduleListAdapter = new ScheduleListAdapter(getApplicationContext(), schedules, userId);
                 scheduleListView.setAdapter(scheduleListAdapter);
             }
         }
@@ -179,7 +184,12 @@ public class ScheduleActivity extends AppCompatActivity {
         @Override
         protected Boolean doInBackground(Void... voids) {
             try {
-                schedules = Arrays.asList(client.getOutboundSchedule(userId));
+                Arrays.asList(client.getOutboundSchedule(userId)).forEach(schedule -> {
+                    Timestamp currentTime = new Timestamp(System.currentTimeMillis());
+                    if (schedule.getDateTime().after(currentTime)) {
+                        schedules.add(schedule);
+                    }
+                });
 
             } catch (RestClientException e) {
                 e.printStackTrace();
@@ -190,7 +200,7 @@ public class ScheduleActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(final Boolean success) {
             if (success) {
-                ScheduleListAdapter scheduleListAdapter = new ScheduleListAdapter(getApplicationContext(), schedules);
+                ScheduleListAdapter scheduleListAdapter = new ScheduleListAdapter(getApplicationContext(), schedules, userId);
                 scheduleListView.setAdapter(scheduleListAdapter);
             }
         }
