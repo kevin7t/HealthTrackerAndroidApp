@@ -16,13 +16,13 @@ import java.util.List;
 import kevin.androidhealthtracker.R;
 
 
-public class FriendsListAdapter extends ArrayAdapter<User> {
+public class FriendsListSpinnerAdapter extends ArrayAdapter<User> {
 
     private Context context;
     private List<User> userList;
 
-    public FriendsListAdapter(@NonNull Context context, List<User> users) {
-        super(context, R.layout.all_friends_listview_item , users);
+    public FriendsListSpinnerAdapter(@NonNull Context context, List<User> users) {
+        super(context, R.layout.list_item, R.id.TextView , users);
         this.userList = users;
         this.context = context;
     }
@@ -30,13 +30,19 @@ public class FriendsListAdapter extends ArrayAdapter<User> {
     @NonNull
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-        convertView = LayoutInflater.from(context).inflate(R.layout.all_friends_listview_item, null, true);
+        convertView = LayoutInflater.from(context).inflate(R.layout.list_item, null, true);
 
-        TextView userNameTextView = convertView.findViewById(R.id.userNameFriendTextView);
-        TextView userScoreTextView = convertView.findViewById(R.id.userScoreTextView);
-
+        TextView userNameTextView = convertView.findViewById(R.id.TextView);
         userNameTextView.setText(userList.get(position).getUserName());
-        userScoreTextView.setText(String.valueOf(userList.get(position).getScore()));
         return convertView;
     }
+
+    @Override
+    public View getDropDownView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
+
+        convertView = LayoutInflater.from(context).inflate(R.layout.list_item, null, true);
+
+        TextView userNameTextView = convertView.findViewById(R.id.TextView);
+        userNameTextView.setText(userList.get(position).getUserName());
+        return convertView;    }
 }
