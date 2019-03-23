@@ -45,7 +45,8 @@
         <activity android:name=".InputUserHealthDataActivity" />
         <activity
             android:name=".CreateScheduleActivity"
-            android:label="@string/title_activity_create_schedule"></activity>
+            android:label="@string/title_activity_create_schedule" />
+        <activity android:name=".ReplyActivity"></activity>
     </application>
 
 </manifest>

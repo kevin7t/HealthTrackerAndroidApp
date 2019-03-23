@@ -69,6 +69,7 @@ configurations {
 android {
     lintOptions {
         lintConfig file("lint.xml")
+        abortOnError false
     }
     compileOptions {
         targetCompatibility 1.8
