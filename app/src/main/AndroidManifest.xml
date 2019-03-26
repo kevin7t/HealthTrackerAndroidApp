@@ -46,7 +46,11 @@
         <activity
             android:name=".CreateScheduleActivity"
             android:label="@string/title_activity_create_schedule" />
-        <activity android:name=".ReplyActivity"></activity>
+        <activity android:name=".ReplyActivity" />
+        <activity
+            android:name=".UserProfile"
+            android:label="@string/title_activity_user_profile"
+            android:theme="@style/AppTheme"></activity>
     </application>
 
 </manifest>

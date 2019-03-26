@@ -30,6 +30,7 @@ import java.util.List;
 import kevin.androidhealthtracker.MainActivity;
 import kevin.androidhealthtracker.R;
 import kevin.androidhealthtracker.ReplyActivity;
+import kevin.androidhealthtracker.UserProfile;
 import kevin.androidhealthtracker.WebClient;
 
 public class StatusListAdapter extends ArrayAdapter<StatusDTO> {
@@ -109,6 +110,15 @@ public class StatusListAdapter extends ArrayAdapter<StatusDTO> {
             public void onClick(View view) {
                 Intent intent = new Intent(context, ReplyActivity.class);
                 intent.putExtra("statusId", statusDTO.getId());
+                context.startActivity(intent);
+            }
+        });
+        userNameTextView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(context, UserProfile.class);
+                intent.putExtra("profileId", statusDTO.getUserId());
+                intent.putExtra("profileName", statusDTO.getUserName());
                 context.startActivity(intent);
             }
         });
