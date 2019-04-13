@@ -1,20 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/colorWhite"
-    android:paddingBottom="20dp">
+    android:paddingBottom="15dp">
 
     <ImageButton
         android:id="@+id/userProfilePicture"
         android:layout_width="46dp"
         android:layout_height="47dp"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/background"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@android:drawable/star_on" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/userNameTextView"
@@ -23,14 +24,15 @@
         android:layout_marginStart="80dp"
         android:layout_marginTop="16dp"
         android:text="Username"
-        android:textColor="@color/colorPrimaryText"
+        android:textColor="@color/colorAccent"
+        android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/statusContentTextView"
         android:layout_width="291dp"
-        android:layout_height="30dp"
+        android:layout_height="24dp"
         android:layout_marginStart="80dp"
         android:layout_marginTop="60dp"
         android:text="Statuscontent"
@@ -48,5 +50,45 @@
         android:textColor="@color/colorSecondaryText"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/likeCountView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="3dp"
+        android:text="0"
+        android:textColor="@color/colorSecondaryText"
+        app:layout_constraintStart_toEndOf="@+id/likeText"
+        app:layout_constraintTop_toBottomOf="@+id/statusContentTextView" />
+
+    <TextView
+        android:id="@+id/likeText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="80dp"
+        android:text="Likes"
+        android:textColor="@color/colorSecondaryText"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/statusContentTextView" />
+
+    <TextView
+        android:id="@+id/replyCountView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="3dp"
+        android:text="0"
+        android:textColor="@color/colorSecondaryText"
+        app:layout_constraintStart_toEndOf="@+id/replyTextView"
+        app:layout_constraintTop_toTopOf="@+id/replyTextView" />
+
+    <TextView
+        android:id="@+id/replyTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="64dp"
+        android:text="Replies"
+        android:textColor="@color/colorSecondaryText"
+        app:layout_constraintStart_toEndOf="@+id/likeCountView"
+        app:layout_constraintTop_toBottomOf="@+id/statusContentTextView" />
 
 </android.support.constraint.ConstraintLayout>

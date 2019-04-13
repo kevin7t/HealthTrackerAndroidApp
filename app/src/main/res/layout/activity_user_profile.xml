@@ -4,8 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorGrey"
-    tools:context="kevin.androidhealthtracker.FriendListActivity">
+    tools:context=".UserProfile">
 
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
@@ -21,33 +20,20 @@
 
     </android.support.design.widget.AppBarLayout>
 
-    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/colorGrey"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        tools:showIn="@layout/content_main">
+        tools:context=".UserProfile"
+        tools:showIn="@layout/activity_user_profile">
 
-
-        <include layout="@layout/content_friends_list_view" />
-
-        <android.support.design.widget.BottomNavigationView
-            android:id="@+id/friendlist_bottom_navigation"
+        <ListView
+            android:id="@+id/profileListview"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:background="@color/colorWhite"
-            app:elevation="16dp"
-            app:itemBackground="@color/colorWhite"
-            app:itemIconTint="@drawable/selector_colors"
-            app:itemTextColor="@drawable/selector_colors"
-            app:menu="@menu/friendlist_fragment_drawer" >
-
-        </android.support.design.widget.BottomNavigationView>
-
-    </RelativeLayout>
+            android:layout_height="match_parent" />
+    </android.support.constraint.ConstraintLayout>
 
 
 </android.support.design.widget.CoordinatorLayout>

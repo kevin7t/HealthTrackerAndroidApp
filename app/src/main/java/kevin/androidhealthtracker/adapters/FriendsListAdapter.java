@@ -22,7 +22,7 @@ public class FriendsListAdapter extends ArrayAdapter<User> {
     private List<User> userList;
 
     public FriendsListAdapter(@NonNull Context context, List<User> users) {
-        super(context, R.layout.all_friends_listview_item, users);
+        super(context, R.layout.all_friends_listview_item , users);
         this.userList = users;
         this.context = context;
     }

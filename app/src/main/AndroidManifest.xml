@@ -38,7 +38,19 @@
             android:name=".FriendListActivity"
             android:label="@string/title_activity_friend_list"
             android:theme="@style/AppTheme" />
-        <activity android:name=".InputUserHealthDataActivity"></activity>
+        <activity
+            android:name=".ScheduleActivity"
+            android:label="@string/title_activity_schedule"
+            android:theme="@style/AppTheme" />
+        <activity android:name=".InputUserHealthDataActivity" />
+        <activity
+            android:name=".CreateScheduleActivity"
+            android:label="@string/title_activity_create_schedule" />
+        <activity android:name=".ReplyActivity" />
+        <activity
+            android:name=".UserProfile"
+            android:label="@string/title_activity_user_profile"
+            android:theme="@style/AppTheme"></activity>
     </application>
 
 </manifest>

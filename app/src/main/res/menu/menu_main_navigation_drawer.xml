@@ -9,6 +9,11 @@
             android:icon="@drawable/ic_account_circle_white_36dp"
             android:title="@string/title_activity_profile" />
         <item
+            android:id="@+id/scheduleMenuItem"
+            android:checked="false"
+            android:icon="@drawable/ic_menu_send"
+            android:title="@string/Schedule" />
+        <item
             android:id="@+id/friendlistMenuItem"
             android:checked="false"
             android:icon="@drawable/ic_friends_24dp"
