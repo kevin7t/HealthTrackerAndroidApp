@@ -1,9 +1,11 @@
 package kevin.androidhealthtracker;
 
+import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -15,8 +17,10 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -52,8 +56,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         //this is localhost
-        client = new WebClient(new RestTemplate(), "10.0.2.2", 8080);
-//        client = new WebClient(new RestTemplate(), "192.168.0.106", 8080);
+//        client = new WebClient(new RestTemplate(), "10.0.2.2", 8080);
+        client = new WebClient(new RestTemplate(), "192.168.0.103", 8080);
 
         prefs = getSharedPreferences("SharedPreferences", MODE_PRIVATE);
         sessionToken = autoLoginPreviousUser();
@@ -143,6 +147,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     };
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_threedot, menu);
+        return true;
+    }
+
+
     private void showLoginActivity() {
         Intent login = new Intent(MainActivity.this, LoginActivity.class);
         startActivityForResult(login, LOGIN_REQUEST_CODE);
@@ -172,7 +183,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         userName = prefs.getString("userName", null);
         userId = prefs.getInt("userId", 0);
         loggedIn = prefs.getBoolean("loggedIn", false);
-        name.setText("Username: " + userName + " ID: " + userId);
+        name.setText("Username: " + userName);
     }
 
     private String autoLoginPreviousUser() {
@@ -210,7 +221,25 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         switch (item.getItemId()) {
             case android.R.id.home:
                 drawer.openDrawer(GravityCompat.START);
+                break;
+
+
+            case R.id.clearLocalProfileMenuItem:
+                SharedPreferences.Editor editor = getSharedPreferences("SharedPreferences", Context.MODE_PRIVATE).edit();
+
+                editor.putBoolean("user_setup_status", false);
+                editor.apply();
+                break;
+
+
+            case R.id.localmode:
+                client = new WebClient(new RestTemplate(), "10.0.2.2", 8080);
+                break;
+
+            case R.id.devicemode:
+                showNetworkSetup();
                 return true;
+
         }
         return super.onOptionsItemSelected(item);
     }
@@ -228,11 +257,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 startActivity(friendListActivityIntent);
                 break;
 
-            case R.id.clearLocalProfileMenuItem:
-                SharedPreferences.Editor editor = getSharedPreferences("SharedPreferences", Context.MODE_PRIVATE).edit();
-
-                editor.putBoolean("user_setup_status", false);
-                editor.apply();
 
             case R.id.profileMenuItem:
                 loadProfileFragment();
@@ -241,9 +265,28 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 Intent scheduleActivityIntent = new Intent(MainActivity.this, ScheduleActivity.class);
                 startActivity(scheduleActivityIntent);
                 break;
+
         }
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    private void showNetworkSetup() {
+        final EditText taskEditText = new EditText(this);
+        taskEditText.setTextColor(getResources().getColor(R.color.colorPrimaryText, null));
+        AlertDialog dialog = new AlertDialog.Builder(this, R.style.MyPickerDialogTheme)
+                .setTitle("Device IP ")
+                .setMessage("Enter device IP")
+                .setView(taskEditText)
+                .setPositiveButton("Add", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        client.setUrl(String.valueOf(taskEditText.getText()));
+                    }
+                })
+                .setNegativeButton("Cancel", null)
+                .create();
+        dialog.show();
     }
 
     /*

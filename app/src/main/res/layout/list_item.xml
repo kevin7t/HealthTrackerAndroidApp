@@ -6,8 +6,8 @@
     android:layout_height="fill_parent"
     android:background="@color/colorWhite"
     android:gravity="left"
-    android:padding="6sp"
+    android:padding="13sp"
     android:singleLine="true"
-    android:textAlignment="center"
-    android:textSize="18dp"
-    android:textColor="@color/colorPrimaryText" />
+    android:textAlignment="textStart"
+    android:textColor="@color/colorPrimaryText"
+    android:textSize="20dp" />

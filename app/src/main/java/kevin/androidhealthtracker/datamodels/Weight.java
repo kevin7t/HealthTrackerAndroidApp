@@ -2,6 +2,7 @@ package kevin.androidhealthtracker.datamodels;
 
 import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
 import android.support.annotation.NonNull;
 
@@ -15,6 +16,7 @@ import lombok.NoArgsConstructor;
 @Entity(tableName = "weight_table")
 public class Weight {
 
+    @Ignore
     public Weight(String date){
         this.date = date;
         weight = 0.0f;

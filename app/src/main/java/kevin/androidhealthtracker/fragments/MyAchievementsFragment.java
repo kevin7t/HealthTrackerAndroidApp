@@ -17,6 +17,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -52,8 +53,7 @@ public class MyAchievementsFragment extends Fragment {
             User user = null;
             try {
                 user = client.getUser(prefs.getInt("userId", 0));
-            }
-            catch (ResourceAccessException e) {
+            } catch (ResourceAccessException e) {
                 e.printStackTrace();
             }
             return user;
@@ -73,6 +73,7 @@ public class MyAchievementsFragment extends Fragment {
         } catch (IOException | NullPointerException e) {
             e.printStackTrace();
         }
+        Collections.reverse(achievements);
         ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity().getApplicationContext(), R.layout.list_item, achievements);
         achievementsListView.setAdapter(adapter);
         return view;
@@ -92,14 +93,12 @@ public class MyAchievementsFragment extends Fragment {
         }
 
         for (Map.Entry<Integer, String> entry : achievementsMap.entrySet()) {
-            if (entry.getKey() <= score){
-                result.add(entry.getValue());
+            if (entry.getKey() <= score) {
+                result.add("Points: " + entry.getKey() + " - " + entry.getValue());
             }
         }
         return result;
     }
-
-
 
 
 }

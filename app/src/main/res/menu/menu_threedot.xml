@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+        
+    <group android:checkableBehavior="single">
+
+        <item
+            android:id="@+id/clearLocalProfileMenuItem"
+            android:checked="false"
+            android:title="Delete local profile"
+            />
+        <item
+            android:id="@+id/localmode"
+            android:checked="false"
+            android:title="Use local mode" />
+        <item
+            android:id="@+id/devicemode"
+            android:checked="false"
+            android:title="Use device mode" />
+
+    </group>
+</menu>

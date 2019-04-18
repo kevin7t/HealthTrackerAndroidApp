@@ -16,9 +16,11 @@ import java.util.List;
 
 public class WebClient {
     private String url;
+    private int port;
     private RestTemplate restTemplate;
 
     public WebClient(RestTemplate restTemplate, String host, int port) {
+        this.port = port;
         this.url = String.format("http://%s:%d/healthtracker", host, port);
         this.restTemplate = restTemplate;
     }
@@ -149,5 +151,10 @@ public class WebClient {
 
     public Schedule[] getOutboundSchedule(int userId){
         return restTemplate.getForObject(url + "/schedule/getoutbound/"+userId, Schedule[].class);
+    }
+
+    public WebClient setUrl(String url){
+        this.url = String.format("http://%s:%d/healthtracker", url, port);
+        return this;
     }
 }

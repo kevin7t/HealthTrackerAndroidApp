@@ -140,6 +140,7 @@ public class UserProgressFragment extends Fragment {
                 e.printStackTrace();
             }
             refreshProgress();
+            refreshWeightgraph();
         }
 
 
@@ -164,6 +165,9 @@ public class UserProgressFragment extends Fragment {
         burntCaloriesTextView.setText(burntCalories.toString());
         burntCaloriesEditText.setText(burntCalories.toString());
         netCaloriesTextView.setText(netCalories.toString());
+    }
+
+    private void refreshWeightgraph(){
         weightEditText.setText(weight.getWeight().toString());
         weightGraph.addSeries(getWeightGraph());
         setMinMaxAxis();
@@ -176,6 +180,7 @@ public class UserProgressFragment extends Fragment {
                 Float value = Float.valueOf(weightEditText.getText().toString());
                 weight.setWeight(value);
                 refreshProgress();
+                refreshWeightgraph();
                 saveWeightToDB();
                 InputMethodManager imm = (InputMethodManager) view.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
                 imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
@@ -197,7 +202,7 @@ public class UserProgressFragment extends Fragment {
     };
 
     private View.OnClickListener decreaseCaloriesConsumedListener = view -> {
-        dailyCalories.incrementBurntCalories(100);
+        dailyCalories.decrementConsumedCalories(100);
         consumedCaloriesEditText.setText(Integer.toString(dailyCalories.getConsumedCalories()));
         refreshProgress();
         saveCaloriesToDB();
@@ -238,6 +243,7 @@ public class UserProgressFragment extends Fragment {
                         e.printStackTrace();
                     }
                     refreshProgress();
+                    refreshWeightgraph();
                 } catch (Resources.NotFoundException e) {
                     e.printStackTrace();
                 }
@@ -301,6 +307,7 @@ public class UserProgressFragment extends Fragment {
     private LineGraphSeries<DataPoint> getWeightGraph() {
         LineGraphSeries<DataPoint> lineGraphSeries = new LineGraphSeries<>();
         List<Weight> weightList = getAllWeightFromDB();
+        Collections.reverse(weightList);
 //        SimpleDateFormat formatter = new SimpleDateFormat(
 //                "EEE MMM dd HH:mm:ss zzz yyyyy");
         for (int i = 0; i < weightList.size(); i++) {
@@ -336,7 +343,7 @@ public class UserProgressFragment extends Fragment {
         weightList.forEach(w -> weights.add(w.getWeight()));
         weightGraph.getViewport().setMaxY(Collections.max(weights));
         weightGraph.getViewport().setMinY(Collections.min(weights));
-        weightGraph.getViewport().setYAxisBoundsManual(true);
+//        weightGraph.getViewport().setYAxisBoundsManual(true);
         weightGraph.getViewport().setMaxX(weightList.size());
         weightGraph.getViewport().setMinX(1);
         weightGraph.getGridLabelRenderer().setHumanRounding(false);
@@ -344,6 +351,9 @@ public class UserProgressFragment extends Fragment {
         weightGraph.getGridLabelRenderer().setLabelFormatter(new LabelFormatter() {
             @Override
             public String formatLabel(double value, boolean isValueX) {
+                if (isValueX){
+                    return "";
+                }
                 return String.valueOf((int) value);
             }
 

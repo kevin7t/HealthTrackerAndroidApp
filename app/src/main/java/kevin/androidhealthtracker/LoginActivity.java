@@ -3,8 +3,10 @@ package kevin.androidhealthtracker;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
+import android.app.AlertDialog;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.Loader;
 import android.content.SharedPreferences;
@@ -66,6 +68,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         mPasswordView.setOnEditorActionListener(passwordOnEditorActionListener);
         mEmailSignInButton.setOnClickListener(emailSignInButtonOnClickListener);
         mRegistrationButton.setOnClickListener(registrationButtonOnClickListener);
+        showNetworkSetup();
     }
 
     /**
@@ -96,7 +99,23 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             startActivity(registrationIntent);
         }
     };
-
+    private void showNetworkSetup() {
+        final EditText taskEditText = new EditText(this);
+        taskEditText.setTextColor(getResources().getColor(R.color.colorPrimaryText,null));
+        AlertDialog dialog = new AlertDialog.Builder(this, R.style.MyPickerDialogTheme)
+                .setTitle("Device IP ")
+                .setMessage("Enter device IP")
+                .setView(taskEditText)
+                .setPositiveButton("Add", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        MainActivity.client.setUrl(String.valueOf(taskEditText.getText()));
+                    }
+                })
+                .setNegativeButton("Cancel", null)
+                .create();
+        dialog.show();
+    }
     /**
      * Attempts to sign in or register the account specified by the login form.
      * If there are form errors (invalid email, missing fields, etc.), the
