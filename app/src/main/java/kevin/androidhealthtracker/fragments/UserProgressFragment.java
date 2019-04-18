@@ -347,7 +347,7 @@ public class UserProgressFragment extends Fragment {
         weightGraph.getViewport().setMaxX(weightList.size());
         weightGraph.getViewport().setMinX(1);
         weightGraph.getGridLabelRenderer().setHumanRounding(false);
-        weightGraph.getGridLabelRenderer().setPadding(60);
+        weightGraph.getGridLabelRenderer().setPadding(30);
         weightGraph.getGridLabelRenderer().setLabelFormatter(new LabelFormatter() {
             @Override
             public String formatLabel(double value, boolean isValueX) {
