@@ -37,25 +37,29 @@
             android:id="@+id/userNameTextView"
             android:layout_width="wrap_content"
             android:layout_height="22dp"
-            android:layout_marginStart="4dp"
-            android:textColor="@android:color/primary_text_light"
-            app:layout_constraintStart_toEndOf="@+id/imageView"
+            android:layout_marginStart="20dp"
+            android:textColor="@color/colorPrimaryDark"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <ImageView
             android:id="@+id/imageView"
-            android:layout_width="75dp"
-            android:layout_height="70dp"
-            android:background="#000000"
+            android:layout_width="71dp"
+            android:layout_height="46dp"
+            android:layout_marginStart="4dp"
+            android:layout_marginTop="24dp"
             android:padding="1dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@android:drawable/btn_star_big_on" />
+            app:srcCompat="@drawable/status" />
 
         <EditText
             android:id="@+id/statusContentTextView"
             android:layout_width="346dp"
             android:layout_height="56dp"
+            android:layout_marginStart="16dp"
             android:layout_marginTop="8dp"
             android:ems="10"
             android:hint="@string/new_status"
@@ -63,7 +67,7 @@
             android:textAlignment="textStart"
             android:textColor="@android:color/primary_text_light"
             android:textColorHint="@color/colorSecondaryText"
-            app:layout_constraintStart_toStartOf="@+id/imageView"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/imageView" />
 
         <Spinner
@@ -71,7 +75,7 @@
             android:layout_width="190dp"
             android:layout_height="46dp"
             android:layout_marginStart="76dp"
-            android:layout_marginTop="32dp"
+            android:layout_marginTop="24dp"
 
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />

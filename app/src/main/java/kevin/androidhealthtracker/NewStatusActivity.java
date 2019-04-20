@@ -47,7 +47,7 @@ public class NewStatusActivity extends AppCompatActivity {
         statusTextview = findViewById(R.id.statusContentTextView);
         statusTypeSpinner = findViewById(R.id.statusTypeSpinner);
 
-        usernameTextview.setText("Username: " + userName);
+        usernameTextview.setText(userName);
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.status_type, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(R.layout.spinner_dropdown_item);
         statusTypeSpinner.setOnItemSelectedListener(spinnerListener);
